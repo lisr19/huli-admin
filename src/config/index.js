@@ -2,7 +2,7 @@ export default {
   /**
    * @description 配置显示在浏览器标签的title
    */
-  title: 'iView-admin',
+  title: '互联网+护理',
   /**
    * @description token在Cookie中存储的天数，默认1天
    */
@@ -12,7 +12,7 @@ export default {
    *              如果不使用，则需要在路由中给需要在菜单中展示的路由设置meta: {title: 'xxx'}
    *              用来在菜单中显示文字
    */
-  useI18n: true,
+  useI18n: false,
   /**
    * @description api请求基础路径
    */
@@ -20,6 +20,7 @@ export default {
     dev: 'https://www.easy-mock.com/mock/5add9213ce4d0e69998a6f51/iview-admin/',
     pro: 'https://produce.com'
   },
+  imgBaseUrl: 'http://192.168.0.123:8082/api/0.1/upload/img',
   /**
    * @description 默认打开的首页的路由name值，默认为home
    */

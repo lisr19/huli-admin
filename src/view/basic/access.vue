@@ -1,0 +1,151 @@
+<template>
+  <div>
+    <!--按钮部分-->
+    <Card>
+      <p slot="title">权限管理</p>
+      <Row>
+        <Col span="2">
+          <Button type="primary" class="my-btn" v-if="viewAdd" @click="isAdd = true">添加</Button>
+        </Col>
+      </Row>
+    </Card>
+
+    <!--表格部分-->
+    <Card>
+      <div>
+        <tree-table
+          :is-fold="false"
+          border
+          expand-key="name"
+          :expand-type="false"
+          :selectable="false"
+          :columns="columns"
+          :data="tableData"
+          getCheckedProp
+        >
+          <template slot="action" slot-scope="{row}">
+            <Button type="primary" style="width: 80px;marginRight: 20px;" v-if="viewEdit">编辑</Button>
+            <Button type="error" style="width: 80px;" v-if="viewDel" @click="doAccessDel(row)">删除</Button>
+          </template>
+        </tree-table>
+      </div>
+    </Card>
+
+    <!--添加Modal-->
+    <Modal v-model="isAdd" :mask-closable="false" :closable="false" title="角色添加：" width="550">
+      <Form :model="addForm" ref="addForm" :label-width="120" :rules="rules">
+        <FormItem label="权限名称：" prop="name">
+          <Input clearable v-model="addForm.name" placeholder="权限名称"/>
+        </FormItem>
+        <FormItem label="对应url：" prop="url">
+          <Input clearable v-model="addForm.url" placeholder="对应url"/>
+        </FormItem>
+        <FormItem label="对应前端组件：" prop="front">
+          <Input clearable v-model="addForm.front" placeholder="对应前端组件"/>
+        </FormItem>
+        <FormItem label="父级权限：">
+          <Cascader :data="accessCas" v-model="addForm.accessCas" placeholder="权限的父级权限"></Cascader>
+        </FormItem>
+      </Form>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="text" @click="cancelAddModal">取消</Button>
+        <!--<Button type="primary" @click="doRoleAdd">确认</Button>-->
+      </div>
+    </Modal>
+  </div>
+</template>
+
+<script>
+  import {accessColumns} from '../../libs/table'
+  import {accessRules} from "../../libs/rules";
+  import {hasOneOf, array4tree,tools4Del} from '@/libs/tools'
+
+
+  export default {
+    name: "access",
+    computed: {
+      access() {
+        return this.$store.state.user.access
+      },
+      viewAdd() {
+        // return hasOneOf(['access-add'], this.access)
+        return true
+      },
+      viewEdit() {
+        // return hasOneOf(['access-edit'], this.access)
+        return true
+      },
+      viewDel() {
+        // return hasOneOf(['access-del'], this.access)
+        return true
+      },
+      viewDelMany() {
+        // return hasOneOf(['access-delMany'], this.access)
+        return true
+      },
+    },
+    data() {
+      return {
+        isAdd: false,
+        isEdit: false,
+        columns: [],
+        tableData: [],
+        addForm: {},
+        editForm: {},
+        rules: {},
+        accessCas:[],
+        searchOption: {}, // 查询用参数
+      }
+    },
+    created(){
+      this.columns = accessColumns
+      this.rules = accessRules
+    },
+    methods:{
+      //权限删除
+      doAccessDel(row){
+        this.$Modal.confirm({
+          title: '请确认删除',
+          content: `<p>删除数据: ${row.name} 后无法恢复,确认删除?</p>`,
+          okText: '确认',
+          onOk: () => {
+            if (row[`children`]) { // 若是该数据有子类
+              let ids = ''
+              ids = row.id
+              let idArray = []
+              tools4Del(row.children, idArray)
+              ids = ids + ',' + idArray.join(',')
+              // console.log(ids)
+            } else { // 若没有则删除单个
+              let id = { id: row.id }
+            }
+          },
+          // 取消删除
+          onCancel: () => {
+            this.$Message.info('取消删除！')
+          }
+        })
+      },
+      cancelAddModal() {
+        this.$refs.addForm.resetFields()// 重置表单
+        this.addForm = {}
+        this.isAdd = false
+      },
+      // 编辑modal打开
+      openEditModal(params) {
+        this.editForm = params
+        this.isEdit = true
+      },
+      cancelEditModal() {
+        this.$refs.editForm.resetFields()// 重置表单
+        this.editForm = {}
+        this.isEdit = false
+      },
+    }
+  }
+</script>
+
+<style scoped>
+
+</style>

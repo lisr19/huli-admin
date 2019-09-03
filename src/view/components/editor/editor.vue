@@ -1,7 +1,7 @@
 <template>
   <div>
     <editor ref="editor" :value="content" @on-change="handleChange"/>
-    <Button @click="changeContent">修改编辑器内容</Button>
+    <!--<Button @click="changeContent">修改编辑器内容</Button>-->
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default {
   },
   data () {
     return {
-      content: '12312323'
+      content: ''
     }
   },
   methods: {
@@ -22,7 +22,7 @@ export default {
       console.log(html, text)
     },
     changeContent () {
-      this.$refs.editor.setHtml('<p>powered by wangeditor</p>')
+      this.$refs.editor.setHtml('')
     }
   }
 }

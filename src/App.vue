@@ -21,6 +21,12 @@ html,body{
   margin: 0;
   padding: 0;
 }
+.ivu-page{
+  margin-bottom: 2px;
+}
+.my-btn{
+  width: 90%;
+}
 #app {
   .size;
 }

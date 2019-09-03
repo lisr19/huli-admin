@@ -213,3 +213,37 @@ export const objEqual = (obj1, obj2) => {
   /* eslint-disable-next-line */
   else return !keysArr1.some(key => obj1[key] != obj2[key])
 }
+
+/**
+ * @array转树(array中必须含有id（自身标记string/int），pid（父亲标记string/int）)
+ * @params change(自定义function，参数为循环元素),array(源数组)
+ **/
+export const array4tree = function (change, array, pid = '0', level = 0) {
+  let tree = []
+  level++
+  array.forEach(v => {
+    v.id = v.id.toString();
+    v.pid = v.pid.toString()
+    change(v);
+    if (v.pid === pid) {
+      v.level = level.toString()
+      let children = array2tree(change, array, v.id, level)
+      if (children.length > 0) {
+        v.children = children
+      }
+      tree.push(v)
+    }
+  })
+  return tree
+}
+
+/**
+ * @递归获取删除id
+ * @params idArray(结果数组),array(源数组)
+ **/
+export const tools4Del = function(array, idArray) {
+  array.forEach(v => {
+    idArray.push(v.id)
+    if (v[`children`]) tools4Del(v.children, idArray)
+  })
+}
