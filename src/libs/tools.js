@@ -227,7 +227,7 @@ export const array4tree = function (change, array, pid = '0', level = 0) {
     change(v);
     if (v.pid === pid) {
       v.level = level.toString()
-      let children = array2tree(change, array, v.id, level)
+      let children = array4tree(change, array, v.id, level)
       if (children.length > 0) {
         v.children = children
       }
@@ -246,4 +246,44 @@ export const tools4Del = function(array, idArray) {
     idArray.push(v.id)
     if (v[`children`]) tools4Del(v.children, idArray)
   })
+}
+
+/**
+ * @递归获取树状对象id
+ * @params resArray(结果数组),array(源数组)
+ **/
+export const tools4Cas = function(array, id, resArray) {
+  array.forEach((v) => {
+    if (v.id === id) {
+      if (v.pid === 0) {
+        if (resArray.length === 0) {
+          resArray.unshift(v.pid.toString())
+        }
+      } else {
+        resArray.unshift(v.pid.toString())
+        tools4Cas(array, v.pid, resArray)
+      }
+    }
+  })
+}
+
+
+/**
+ * 对象内容对比
+ * */
+export const ObjectContrast = function(objA,objB){
+  let array = []
+  for(let i in objA){
+    if(Date.prototype.isPrototypeOf(objA[i]) || Date.prototype.isPrototypeOf(objB[i])){
+      objA[i] = new Date(objA[i]).Format("yyyy-MM-dd");
+      objB[i] = new Date(objB[i]).Format("yyyy-MM-dd");
+    }
+    if(Array.prototype.isPrototypeOf(objA[i]) || Array.prototype.isPrototypeOf(objB[i])){
+      continue;
+    }
+    if(objA[i] != objB[i]){
+      array.push(i)
+    }
+  }
+  return array
 }

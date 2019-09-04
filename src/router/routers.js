@@ -81,6 +81,73 @@ export default [
     ]
   },
   {
+    path: '/nurse',
+    name: 'nurse',
+    component: Main,
+    meta: {
+      title: '护士管理',
+      showAlways: true,
+    },
+    children: [
+      {
+        path: '/nurse_info',
+        name: 'nurse_info',
+        meta: {
+          title: '护士信息',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/nurse/nurse-info')
+      },
+      {
+        path: '/nurse_pending',
+        name: 'nurse_pending',
+        meta: {
+          title: '拒绝/未审护士',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/nurse/nurse-pending')
+      }
+    ]
+  },
+  {
+    path: '/orders',
+    name: 'orders',
+    component: Main,
+    meta: {
+      title: '订单管理',
+      showAlways: true,
+    },
+    children: [
+      {
+        path: '/orders_info',
+        name: 'orders_info',
+        meta: {
+          title: '订单信息',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/orders/orders-info')
+      },
+      {
+        path: '/orders_pending',
+        name: 'orders_pending',
+        meta: {
+          title: '待审订单',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/orders/orders-pending')
+      },
+      {
+        path: '/orders_refund',
+        name: 'orders_refund',
+        meta: {
+          title: '订单退款',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/orders/orders-refund')
+      }
+    ]
+  },
+  {
     path: '/data_dictionary',
     name: 'data_dictionary',
     component: Main,

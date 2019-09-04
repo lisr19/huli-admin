@@ -8,7 +8,7 @@ export const adminColumns = [
     align: 'center'
   },
   {
-    title: '用户名',
+    title: '账号',
     align: 'center',
     key: 'username'
   },
@@ -25,16 +25,21 @@ export const adminColumns = [
   {
     title: '邮箱',
     align: 'center',
-    key: 'mail'
+    key: 'email'
   },
   {
-    title: '性别',
+    title: '角色',
     align: 'center',
-    key: 'gender',
     render: (h, params) => {
-      return h('span', [
-        params.row.gender === 0 ? '无' : (params.row.gender === 1 ? '男' : '女')
-      ])
+      let str = ''
+      if (params.row[`roles`] && params.row.roles.length > 0) {
+        params.row.roles.forEach(v => {
+          str !== '' ? str = str + v.name + ' ' : str = v.name + ' '
+        })
+      } else {
+        str = '暂无'
+      }
+      return h('span', [str])
     }
   },
   {
@@ -43,7 +48,7 @@ export const adminColumns = [
     key: 'status',
     render: (h, params) => {
       return h('span', [
-        params.row.status === 0 ? '禁用' : '正常'
+        params.row.isEnable === 0 ? '禁用' : '正常'
       ])
     }
   },
@@ -52,18 +57,17 @@ export const adminColumns = [
 //角色
 export const roleColumns = [
   {
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
     title: '角色名称',
     key: 'name'
   },
   {
-    title: '层级',
-    key: 'level'
-  },
-  {
-    title: '操作',
-    key: 'action',
-    type: 'template',
-    template: 'action'
+    title: '角色别称',
+    key: 'roleAlias'
   }
 ]
 
@@ -80,6 +84,19 @@ export const accessColumns = [
   {
     title: '对应前端组件',
     key: 'front'
+  },
+  {
+    title: '应用类型',
+    key: 'type',
+    render: (h, params) => {
+      return h('span', [
+        params.row.type === 0 ? '无' : '管理端'
+      ])
+    }
+  },
+  {
+    title: '层级',
+    key: 'level'
   },
   {
     title: '操作',
@@ -156,6 +173,211 @@ export const customerInfoColumns = [
         params.row.status === 0 ? '禁用' : '正常'
       ])
     }
+  },
+]
+
+//护士信息
+export const nurseInfoColumns = [
+  {
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
+    title: '护士头像',
+    align: 'center',
+    key: 'avatar',
+    render: (h, params) => {
+      return h('img', {
+        style: {
+          margin: '5px',
+          display: 'inline-block',
+          height: '40px',
+          width: '40px',
+          borderRadius: '5px'
+        },
+        attrs: {
+          src: params.row['avatar']
+            ? params.row['avatar'] + '?imageView2/1/w/45/h/45'
+            : 'http://sdcmi.halohealth.cn/images/1552373693998.jpg'
+        }
+      })
+    }
+  },
+  {
+    title: '姓名',
+    align: 'center',
+    key: 'name'
+  },
+  {
+    title: '电话',
+    align: 'center',
+    key: 'phone'
+  },
+  {
+    title: '性别',
+    align: 'center',
+    key: 'gender',
+    render: (h, params) => {
+      return h('span', [
+        params.row.gender === 0 ? '无' : (params.row.gender === 1 ? '男' : '女')
+      ])
+    }
+  },
+  {
+    title: '资质状态',
+    align: 'center',
+    key: 'status',
+    render: (h, params) => {
+      return h('span', [
+        params.row.status === 0 ? '未审核' : '已通过'
+      ])
+    }
+  },
+  {
+    title: '相关资质',
+    align: 'center',
+    key: 'label',
+  },
+  {
+    title: '使用状态',
+    align: 'center',
+    key: 'status2',
+    render: (h, params) => {
+      return h('span', [
+        params.row.status2 === 0 ? '禁用' : '正常'
+      ])
+    }
+  },
+]
+//待审护士信息
+export const nursePendingColumns = [
+  {
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
+    title: '护士头像',
+    align: 'center',
+    key: 'avatar',
+    render: (h, params) => {
+      return h('img', {
+        style: {
+          margin: '5px',
+          display: 'inline-block',
+          height: '40px',
+          width: '40px',
+          borderRadius: '5px'
+        },
+        attrs: {
+          src: params.row['avatar']
+            ? params.row['avatar'] + '?imageView2/1/w/45/h/45'
+            : 'http://sdcmi.halohealth.cn/images/1552373693998.jpg'
+        }
+      })
+    }
+  },
+  {
+    title: '姓名',
+    align: 'center',
+    key: 'name'
+  },
+  {
+    title: '电话',
+    align: 'center',
+    key: 'phone'
+  },
+  {
+    title: '性别',
+    align: 'center',
+    key: 'gender',
+    render: (h, params) => {
+      return h('span', [
+        params.row.gender === 0 ? '无' : (params.row.gender === 1 ? '男' : '女')
+      ])
+    }
+  },
+  {
+    title: '资质状态',
+    align: 'center',
+    key: 'status',
+    render: (h, params) => {
+      return h('span', [
+        params.row.status === 0 ? '' : '未审核'
+      ])
+    }
+  },
+]
+
+//订单信息
+export const ordersInfoColumns = [
+  {
+    title: '订单号',
+    align: 'center',
+    key: 'orderNumber',
+    width: 150,
+    fixed: 'left'
+  },
+  {
+    title: '客户姓名',
+    align: 'center',
+    width: 150,
+    key: 'customerName'
+  },
+  {
+    title: '客户手机',
+    align: 'center',
+    width: 150,
+    key: 'phone'
+  },
+  {
+    title: '护理项目类型',
+    align: 'center',
+    width: 150,
+    key: 'nursingType'
+  },
+  {
+    title: '护理服务',
+    align: 'center',
+    width: 150,
+    key: 'nursing'
+  },
+  {
+    title: '金额（￥）',
+    align: 'center',
+    width: 150,
+    key: 'price'
+  },
+  {
+    title: '预约时间',
+    align: 'center',
+    width: 150,
+    key: 'addTime'
+  },
+  {
+    title: '接单护士',
+    align: 'center',
+    width: 150,
+    key: 'nurseName'
+  },
+  {
+    title: '审核状态',
+    align: 'center',
+    width: 150,
+    key: 'credentialsStatus'
+  },
+  {
+    title: '审核结果',
+    align: 'center',
+    width: 150,
+    key: 'credentialsResult'
+  },
+  {
+    title: '订单状态',
+    align: 'center',
+    width: 150,
+    key: 'orderStatus'
   },
 ]
 

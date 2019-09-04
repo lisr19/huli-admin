@@ -2,14 +2,14 @@
   <div>
     <!--按钮部分-->
     <Card>
-      <p slot="title">管理员管理</p>
+      <p slot="title">护士信息管理</p>
       <Row>
         <Col span="2">
           <Button type="primary" class="my-btn" v-if="viewAdd" @click="isAdd = true">添加</Button>
         </Col>
 
         <Col span="2">
-          <Button type="error" class="my-btn" v-if="viewDelMany" @click="batchDel">批量删除</Button>
+          <Button type="error" class="my-btn" v-if="viewDelMany">批量删除</Button>
         </Col>
       </Row>
     </Card>
@@ -29,11 +29,11 @@
     </Card>
 
     <!--添加Modal-->
-    <Modal v-model="isAdd" :mask-closable="false" :closable="false" title="管理员添加：" width="600">
-      <Form :model="addForm" ref="addForm" :rules="addRules" :label-width="90">
+    <Modal v-model="isAdd" :mask-closable="false" :closable="false" title="护士添加：" width="600">
+      <Form :model="addForm" ref="addForm" :rules="addRules" :label-width="120">
         <Card>
-          <FormItem label="用户名：" prop="username">
-            <Input clearable v-model="addForm.username" placeholder="请填写用户名姓名"/>
+          <FormItem label="头像：" prop="avatar">
+            <img-upload ref="imgUpload" @imgUpload="getUploadImg" @delImg="delUploadImg"></img-upload>
           </FormItem>
           <FormItem label="姓名：" prop="name">
             <Input clearable v-model="addForm.name" placeholder="请填写姓名"/>
@@ -41,8 +41,15 @@
           <FormItem label="电话：" prop="phone">
             <Input clearable v-model="addForm.phone" placeholder="请填写电话"/>
           </FormItem>
-          <FormItem label="邮箱：" prop="email">
-            <Input clearable v-model="addForm.email" placeholder="请填写邮箱"/>
+          <FormItem label="性别：" prop="gender">
+            <Select clearable v-model="addForm.gender" placeholder="请选择性别" style="width: 100%">
+              <Option value="0" key="0">无</Option>
+              <Option value="1" key="1">男</Option>
+              <Option value="2" key="2">女</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="出声年月日：" prop="birthday">
+            <DatePicker type="date" placeholder="请选择出声年月日" style="width: 100%"></DatePicker>
           </FormItem>
           <FormItem label="密码：" prop="password">
             <Input clearable v-model="addForm.password" type="password" placeholder="请输入密码"/>
@@ -55,16 +62,16 @@
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelAddModal">取消</Button>
-        <Button type="primary" @click="doManagerAdd">确认</Button>
+        <!--<Button type="primary" @click="doAdminAdd">确认</Button>-->
       </div>
     </Modal>
 
     <!--编辑Modal-->
-    <Modal v-model="isEdit" :mask-closable="false" :closable="false" title="管理员编辑：" width="600">
-      <Form :model="editForm" ref="editForm" :rules="editRules" :label-width="90">
+    <Modal v-model="isEdit" :mask-closable="false" :closable="false" title="护士编辑：" width="600">
+      <Form :model="editForm" ref="editForm" :rules="editRules" :label-width="120">
         <Card>
-          <FormItem label="用户名：" prop="username">
-            <Input clearable v-model="editForm.username" placeholder="请填写用户名姓名"/>
+          <FormItem label="头像：" prop="avatar">
+            <img-upload ref="imgUploadByEdit" @imgUpload="getUploadImg" @delImg="delUploadImg"></img-upload>
           </FormItem>
           <FormItem label="姓名：" prop="name">
             <Input clearable v-model="editForm.name" placeholder="请填写姓名"/>
@@ -72,11 +79,18 @@
           <FormItem label="电话：" prop="phone">
             <Input clearable v-model="editForm.phone" placeholder="请填写电话"/>
           </FormItem>
-          <FormItem label="邮箱：" prop="email">
-            <Input clearable v-model="editForm.email" placeholder="请填写邮箱"/>
+          <FormItem label="性别：" prop="gender">
+            <Select clearable v-model="editForm.gender" placeholder="请选择性别" style="width: 100%">
+              <Option value="0" key="0">无</Option>
+              <Option value="1" key="1">男</Option>
+              <Option value="2" key="2">女</Option>
+            </Select>
+          </FormItem>
+          <FormItem label="出声年月日：" prop="birthday">
+            <DatePicker type="date" placeholder="请选择出声年月日" style="width: 100%"></DatePicker>
           </FormItem>
           <FormItem label="密码：" prop="password">
-            <Input clearable v-model="editForm.password" type="password" placeholder="若不修改则可不填"/>
+            <Input clearable v-model="editForm.password" type="password" placeholder="请输入密码"/>
           </FormItem>
           <FormItem label="确认密码：" prop="rePassword">
             <Input clearable v-model="editForm.rePassword" type="password" placeholder="请确认密码"/>
@@ -86,49 +100,60 @@
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelEditModal">取消</Button>
-        <Button type="primary" @click="doManagerEdit">确认</Button>
+        <!--<Button type="primary" @click="doAdminAdd">确认</Button>-->
+      </div>
+    </Modal>
+
+    <!--资质-->
+    <Modal v-model="isDetail" :mask-closable="false" :closable="false" title="护士资质：" width="1000">
+      <Credentials :detailStatus="detailStatus"></Credentials>
+      <div slot="footer">
+        <Button type="text" @click="cancelModal">取消</Button>
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
-  import {findManager,doManagerAdd,doManagerEdit,doManagerDel,doManagerDelMany} from "../../api/manager";
-
-  import {adminColumns} from '../../libs/table'
-  import {adminRules} from "../../libs/rules";
-  import {hasOneOf, array4tree,ObjectContrast} from '@/libs/tools'
+  import {nurseInfoColumns} from "../../libs/table";
+  import {hasOneOf, array4tree} from '@/libs/tools'
+  import ImgUpload from '../components/img-upload/img-upload'
+  import Credentials from './nurse-credentials'
 
   export default {
-    name: "admin",
+    name: "nurse-info",
+    components:{
+      ImgUpload,
+      Credentials
+    },
     computed: {
       access() {
         return this.$store.state.user.access
       },
-      viewAdd() { // 该用户是否拥有用户添加权限
-        // return hasOneOf(['admin-add'], this.access)
+      viewAdd() {
+        // return hasOneOf(['nurse-add'], this.access)
         return true
       },
-      viewEdit() { // 该用户是否拥有用户信息编辑权限
-        // return hasOneOf(['admin-edit'], this.access)
+      viewEdit() {
+        // return hasOneOf(['nurse-edit'], this.access)
         return true
       },
-      viewDel() { // 该用户是否拥有用户删除权限
-        // return hasOneOf(['admin-del'], this.access)
+      viewDel() {
+        // return hasOneOf(['nurse-del'], this.access)
         return true
       },
-      viewDelMany() { // 该用户是否拥有用户删除权限
-        // return hasOneOf(['admin-delMany'], this.access)
+      viewDelMany() {
+        // return hasOneOf(['nurse-delMany'], this.access)
         return true
       },
-      viewRole() { // 该用户是否拥有用户角色变更权限
-        // if (hasOneOf(['admin-role-add'], this.access) && hasOneOf(['admin-role-del'], this.access)) {
-        //   return true
-        // } else {
-        //   return false
-        // }
+      viewLabel() {
+        // return hasOneOf(['nurse-label'], this.access)
         return true
-      }
+      },
+      viewDetail() {
+        // return hasOneOf(['nurse-detail'], this.access)
+        return true
+      },
     },
     data() {
       // 校验
@@ -154,30 +179,32 @@
       return {
         isAdd:false,
         isEdit:false,
+        isDetail:false,
+        detailStatus:true,
         columns: [
           {
             title: '操作',
             align: 'center',
             key: 'handle',
+            width:300,
             render: (h, params) => {
-              if (this.viewRole || this.viewEdit || this.viewDel) {
+              if (this.viewEdit || this.viewDel || this.viewDetail) {
                 return h('div', [
                   h('Button', {
                     props: {
-                      type: 'success'
+                      type: 'warning'
                     },
                     style: {
                       marginRight: '5px',
-                      display: this.viewRole ? 'inline-block' : 'none'
+                      display: this.viewDetail ? 'inline-block' : 'none'
                     },
                     on: {
                       click: () => {
-                        let data = Object.assign({}, params.row)
-                        // this.formCopy = Object.assign({}, data)
-                        // this.openEditModal(data)
+                        // this.isHealth = true
+                        this.openModal()
                       }
                     }
-                  }, '角色'),
+                  }, '资质'),
                   h('Button', {
                     props: {
                       type: 'primary'
@@ -189,7 +216,7 @@
                     on: {
                       click: () => {
                         let data = Object.assign({}, params.row)
-                        this.formCopy = Object.assign({}, data)
+                        // this.formCopy = Object.assign({}, data)
                         this.openEditModal(data)
                       }
                     }
@@ -209,7 +236,7 @@
                           okText: '确认',
                           onOk: () => {
                             let id = {id: params.row.id}
-                            this.doManagerDel(id)
+                            // this.doAdminDel(id)
                           },
                           // 取消删除
                           onCancel: () => {
@@ -226,11 +253,13 @@
             }
           }
         ],
-        tableData: [],
+        tableData: [{}],
         addForm:{},
         editForm:{},
+        detailData:{},
         addRules:{
-          rePassword: [{ validator: validatePassCheck, trigger: 'blur' },{ required: true, message: '密码不能为空', trigger: 'blur' }],
+          rePassword: [{ validator: validatePassCheck, trigger: 'blur' },
+            { required: true, message: '请输入确认密码', trigger: 'blur' },],
         },
         editRules:{
           rePassword: [{ validator: validatePassCheck, trigger: 'blur' }],
@@ -243,121 +272,26 @@
           total: 1, // 数据总数
           currentPage: 1// 当前页面
         },
-        formCopy:{},
         searchOption: {}, // 查询用参数
       }
     },
-    created() {
-      this.columns = adminColumns.concat(this.columns)
-      this.addRules = Object.assign(this.addRules, adminRules)
-      this.addRules.password.push({ required: true, message: '密码不能为空', trigger: 'blur' })
-      this.editRules = Object.assign(this.editRules, adminRules)
+    created(){
+      this.columns = nurseInfoColumns.concat(this.columns)
     },
-    mounted(){
-      this.findManager()
-    },
-    methods: {
-      //查询
-      async findManager(params){
-        let res = await findManager(params)
-        if (res.code === 200) {
-          this.tableData = res.data.list
-          this.page = {
-            total: res.data.total,
-            currentPage: res.data.pageNum
-          }
-        } else {
-          this.$Message.error(res.data)
-        }
+    methods:{
+      // modal打开
+      openModal (params) {
+        this.detailData = params
+        this.isDetail = true
       },
-      //添加
-      async doManagerAdd(){
-        this.$refs.addForm.validate(async (valid) => { // 表单校验
-          if (valid) { // 表单验证成功
-            let form = this.addForm
-            let res = await doManagerAdd(form)
-            if (res.code === 200) { // 添加成功
-              this.$Message.success('添加成功')
-              this.findManager(this.searchOption)
-              this.cancelAddModal()
-            } else { // 添加失败
-              this.$Message.error(res.data)
-            }
-          } else {
-            this.$Message.error('请正确填写表单')
-          }
-        })
-      },
-      //编辑
-      async doManagerEdit(){
-        this.$refs.editForm.validate(async (valid) => { // 表单校验
-          if (valid) { // 表单验证成功
-            let form = this.editForm
-            let array = []
-            array = ObjectContrast(form,this.formCopy)
-            // console.log(array)
-            if(array.length > 0){
-              let data = {}
-              array.forEach(v=>{
-                data[v] = form[v]
-              })
-              data.id = form.id
-              let res = await doManagerEdit(data)
-              if (res.code === 200) {
-                this.$Message.success('编辑成功')
-                this.findManager(this.searchOption)
-                this.cancelEditModal()
-              } else { // 添加失败
-                this.$Message.error(res.data)
-              }
-            }else{
-              this.$Message.error('表单没有修改')
-            }
-          } else {
-            this.$Message.error('请正确填写表单')
-          }
-        })
-      },
-      // 删除
-      async doManagerDel(params) {
-        let res = await doManagerDel(params)
-        if (res.code === 200) {
-          this.$Message.success('删除成功')
-          this.findManager(this.searchOption)
-        } else {
-          this.$Message.error(res.data)
-        }
-      },
-      // 批量删除
-      batchDel() {
-        if (this.delId.ids) {
-          this.$Modal.confirm({ // 打开确认对话框
-            title: '请确认删除',
-            content: `<p>删除数据后无法恢复,确认删除?</p>`,
-            okText: '确认',
-            // 确认删除
-            onOk: async () => {
-              let res = await doManagerDelMany(this.delId)
-              if (res.code === 200) {
-                this.$Message.success('删除成功')
-                this.delId.ids = ''
-                this.findManager(this.searchOption)
-              } else {
-                this.$Message.error(res.message)
-              }
-            },
-            // 取消删除
-            onCancel: () => {
-              this.$Message.info('取消删除！')
-            }
-          })
-        } else {
-          this.$Message.info('请选择需要删除的数据！')
-        }
+      cancelModal(){
+        this.detailData = {}
+        this.isDetail = false
       },
       cancelAddModal(){
         this.$refs.addForm.resetFields()// 重置表单
         this.addForm = {}
+        this.$refs.imgUpload.updateImgUrl([])
         this.isAdd = false
       },
       // 编辑modal打开
@@ -369,6 +303,15 @@
         this.$refs.editForm.resetFields()// 重置表单
         this.editForm = {}
         this.isEdit = false
+      },
+      // 获取上传图片url
+      getUploadImg (url) {
+        this.addForm.avatar = url
+        this.editForm.avatar = url
+      },
+      delUploadImg (url) {
+        this.addForm.avatar = ''
+        this.editForm.avatar = ''
       },
       // 批量选择
       batchSelect(selection) {
@@ -384,7 +327,7 @@
       // 页面翻页
       handlePageTurn(page) {
         this.searchOption.page = page
-        this.findManager(this.searchOption)
+        // this.findAdminData(this.searchOption)
       },
     }
   }

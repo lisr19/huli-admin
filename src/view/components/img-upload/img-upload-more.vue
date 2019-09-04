@@ -68,23 +68,23 @@
         file.name = '图片'
       },
       handleFormatError (file) {
-        // this.$Notice.warning({
-        //   title: '上传的图片格式错误',
-        //   desc: '上传的图片格式不对，只支持jpg,jpeg,png'
-        // })
+        this.$Notice.warning({
+          title: '上传的图片格式错误',
+          desc: '上传的图片格式不对，只支持jpg,jpeg,png'
+        })
       },
       handleMaxSize (file) {
-        // this.$Notice.warning({
-        //   title: '超出上传限制大小',
-        //   desc: '上传的图片最大不能超过10MB'
-        // })
+        this.$Notice.warning({
+          title: '超出上传限制大小',
+          desc: '上传的图片最大不能超过10MB'
+        })
       },
       handleBeforeUpload () {
         const check = this.uploadList.length < 3
         if (!check) {
-          // this.$Notice.warning({
-          //   title: '最多只能上传三张.'
-          // })
+          this.$Notice.warning({
+            title: '最多只能上传三张.'
+          })
         }
         return check
       },

@@ -7,29 +7,23 @@
         <Col span="2">
           <Button type="primary" class="my-btn" v-if="viewAdd" @click="isAdd = true">添加</Button>
         </Col>
+        <Col span="2">
+          <Button type="error" class="my-btn" v-if="viewDelMany" @click="batchDel">批量删除</Button>
+        </Col>
       </Row>
     </Card>
 
     <!--表格部分-->
     <Card>
       <div>
-        <tree-table
-          :is-fold="false"
-          border
-          expand-key="name"
-          :expand-type="false"
-          :selectable="false"
-          :columns="columns"
-          :data="tableData"
-        >
-          <template slot="action" slot-scope="{row}">
-            <Button type="success" style="width: 80px;marginRight: 20px;" v-if="viewAccess">权限</Button>
-            <Button type="primary" style="width: 80px;marginRight: 20px;" v-if="viewEdit" @click="openEditModal(row)">
-              编辑
-            </Button>
-            <Button type="error" style="width: 80px;" v-if="viewDel" @click="doRoleDel(row)">删除</Button>
-          </template>
-        </tree-table>
+        <Table :columns="columns" :data="tableData" border @on-selection-change="batchSelect"
+               disabled-hover></Table>
+      </div>
+      <div style="margin: 10px;overflow: hidden">
+        <div style="float: right;">
+          <Page show-total show-elevator :total="page.total" :current="page.currentPage"
+                @on-change="handlePageTurn"></Page>
+        </div>
       </div>
     </Card>
 
@@ -39,14 +33,14 @@
         <FormItem label="角色名称：" prop="name">
           <Input clearable v-model="addForm.name" placeholder="角色名称"/>
         </FormItem>
-        <FormItem label="父级角色：">
-          <Cascader :data="roleCas" v-model="addForm.roleCas" placeholder="角色的父级角色"></Cascader>
+        <FormItem label="角色别名：" prop="roleAlias">
+          <Input clearable v-model="addForm.roleAlias " placeholder="角色别名"/>
         </FormItem>
       </Form>
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelAddModal">取消</Button>
-        <!--<Button type="primary" @click="doRoleAdd">确认</Button>-->
+        <Button type="primary" @click="doRoleAdd">确认</Button>
       </div>
     </Modal>
 
@@ -56,22 +50,23 @@
         <FormItem label="角色名称：" prop="name">
           <Input clearable v-model="editForm.name" placeholder="角色名称"/>
         </FormItem>
-        <FormItem label="父级角色：">
-          <Cascader :data="roleCas" v-model="editForm.roleCas" placeholder="角色的父级角色"></Cascader>
+        <FormItem label="角色别名：" prop="roleAlias">
+          <Input clearable v-model="editForm.roleAlias " placeholder="角色别名"/>
         </FormItem>
       </Form>
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelEditModal">取消</Button>
-        <!--<Button type="primary" @click="doRoleAdd">确认</Button>-->
+        <Button type="primary" @click="doRoleEdit">确认</Button>
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
+  import {findRole,doRoleAdd,doRoleEdit,doRoleDel,doRoleDelMany} from "../../api/role";
   import {roleColumns} from '../../libs/table'
-  import {hasOneOf, array4tree,tools4Del} from '@/libs/tools'
+  import {hasOneOf, array4tree,tools4Del,ObjectContrast} from '@/libs/tools'
 
   export default {
     name: "role",
@@ -108,102 +103,180 @@
       return {
         isAdd: false,
         isEdit: false,
-        columns: [],
-        tableData: [
+        columns: [
           {
-            name: '南部战区医院',
-            level: 1,
-            children: [
-              {
-                name: '骨科护士',
-                level: 2,
-                children: [
-                  {
-                    name: '护士部1',
-                    level: 3,
-                  },
-                ]
-              },
-              {
-                name: '专科护士',
-                level: 2,
+            title: '操作',
+            align: 'center',
+            key: 'handle',
+            render: (h, params) => {
+              if (this.viewAccess || this.viewEdit || this.viewDel) {
+                return h('div', [
+                  h('Button', {
+                    props: {
+                      type: 'success'
+                    },
+                    style: {
+                      marginRight: '5px',
+                      display: this.viewAccess ? 'inline-block' : 'none'
+                    },
+                    on: {
+                      click: () => {
+                        let data = Object.assign({}, params.row)
+                        // this.formCopy = Object.assign({}, data)
+                        // this.openEditModal(data)
+                      }
+                    }
+                  }, '权限'),
+                  h('Button', {
+                    props: {
+                      type: 'primary'
+                    },
+                    style: {
+                      marginRight: '5px',
+                      display: this.viewEdit ? 'inline-block' : 'none'
+                    },
+                    on: {
+                      click: () => {
+                        let data = Object.assign({}, params.row)
+                        this.formCopy = Object.assign({}, data)
+                        this.openEditModal(data)
+                      }
+                    }
+                  }, '编辑'),
+                  h('Button', {
+                    props: {
+                      type: 'error'
+                    },
+                    style: {
+                      display: this.viewDel ? 'inline-block' : 'none'
+                    },
+                    on: {
+                      click: () => {
+                        this.$Modal.confirm({
+                          title: '请确认删除',
+                          content: `<p>删除数据: ${params.row.name} 后无法恢复,确认删除?</p>`,
+                          okText: '确认',
+                          onOk: () => {
+                            let id = {id: params.row.id}
+                            this.doRoleDel(id)
+                          },
+                          // 取消删除
+                          onCancel: () => {
+                            this.$Message.info('取消删除！')
+                          }
+                        })
+                      }
+                    }
+                  }, '删除')
+                ])
+              } else {
+                return h('span', '您没有操作该数据的权限')
               }
-            ]
-          },
+            }
+          }
         ],
+        tableData: [],
         addForm: {},
         editForm: {},
         rules: {
           name: [
             {required: true, message: '角色名不能为空', trigger: 'blur'},
             {max: 15, message: '请输入15个以内字符', trigger: 'blur'},
+          ],
+          roleAlias: [
+            {required: true, message: '角色别名不能为空', trigger: 'blur'},
+            {max: 15, message: '请输入15个以内字符', trigger: 'blur'},
           ]
         },
-        roleCas: [
-          {
-            label: '无',
-            value:'0',
-          },
-          {
-            label: '南部战区医院',
-            value:'1',
-            level: 1,
-            children: [
-              {
-                label: '骨科护士',
-                value:'2',
-                name: '骨科护士',
-                level: 2,
-                children: [
-                  {
-                    label: '护士部1',
-                    value:'3',
-                    name: '护士部1',
-                    level: 3,
-                  },
-                ]
-              },
-              {
-                label: '专科护士',
-                value:'4',
-                name: '专科护士',
-                level: 2,
-              }
-            ]
-          },
-        ],
+        // 批量选择的id对象
+        delId: {
+          ids: ''
+        },
+        page: {// 页面翻页对象
+          total: 1, // 数据总数
+          currentPage: 1// 当前页面
+        },
+        formCopy:{},
         searchOption: {}, // 查询用参数
       }
     },
     created() {
-      this.columns = roleColumns
+      this.columns = roleColumns.concat(this.columns)
     },
     mounted(){
+      this.findRole()
     },
     methods: {
-      //角色删除
-      doRoleDel(row){
-        this.$Modal.confirm({
-          title: '请确认删除',
-          content: `<p>删除数据: ${row.name} 后无法恢复,确认删除?</p>`,
-          okText: '确认',
-          onOk: () => {
-            if (row[`children`]) { // 若是该数据有子类
-              let ids = ''
-              ids = row.id
-              let idArray = []
-              tools4Del(row.children, idArray)
-              ids = ids + ',' + idArray.join(',')
-              // console.log(ids)
-            } else { // 若没有则删除单个
-              let id = { id: row.id }
+      //查询
+      async findRole(params){
+        let res = await findRole(params)
+        if (res.code === 200) {
+          this.tableData = res.data.list
+          this.page = {
+            total: res.data.total,
+            currentPage: res.data.pageNum
+          }
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
+      //添加
+      async doRoleAdd(){
+        this.$refs.addForm.validate(async (valid) => { // 表单校验
+          if (valid) { // 表单验证成功
+            let form = this.addForm
+            let res = await doRoleAdd(form)
+            if (res.code === 200) { // 添加成功
+              this.$Message.success('添加成功')
+              this.findRole(this.searchOption)
+              this.cancelAddModal()
+            } else { // 添加失败
+              this.$Message.error(res.data)
             }
-          },
-          // 取消删除
-          onCancel: () => {
-            this.$Message.info('取消删除！')
+          } else {
+            this.$Message.error('请正确填写表单')
           }
         })
+      },
+      //编辑
+      async doRoleEdit(){
+        this.$refs.editForm.validate(async (valid) => { // 表单校验
+          if (valid) { // 表单验证成功
+            let form = this.editForm
+            let array = []
+            array = ObjectContrast(form,this.formCopy)
+            // console.log(array)
+            if(array.length > 0){
+              let data = {}
+              array.forEach(v=>{
+                data[v] = form[v]
+              })
+              data.id = form.id
+              let res = await doRoleEdit(data)
+              if (res.code === 200) {
+                this.$Message.success('编辑成功')
+                this.findRole(this.searchOption)
+                this.cancelEditModal()
+              } else { // 添加失败
+                this.$Message.error(res.data)
+              }
+            }else{
+              this.$Message.error('表单没有修改')
+            }
+          } else {
+            this.$Message.error('请正确填写表单')
+          }
+        })
+      },
+      // 删除
+      async doRoleDel(params) {
+        let res = await doRoleDel(params)
+        if (res.code === 200) {
+          this.$Message.success('删除成功')
+          this.findRole(this.searchOption)
+        } else {
+          this.$Message.error(res.data)
+        }
       },
       cancelAddModal() {
         this.$refs.addForm.resetFields()// 重置表单
@@ -212,7 +285,6 @@
       },
       // 编辑modal打开
       openEditModal(params) {
-        console.log(params)
         this.editForm = params
         this.isEdit = true
       },
@@ -220,6 +292,49 @@
         this.$refs.editForm.resetFields()// 重置表单
         this.editForm = {}
         this.isEdit = false
+      },
+      // 批量删除
+      batchDel() {
+        if (this.delId.ids) {
+          this.$Modal.confirm({ // 打开确认对话框
+            title: '请确认删除',
+            content: `<p>删除数据后无法恢复,确认删除?</p>`,
+            okText: '确认',
+            // 确认删除
+            onOk: async () => {
+              let res = await doRoleDelMany(this.delId)
+              if (res.code === 200) {
+                this.$Message.success('删除成功')
+                this.delId.ids = ''
+                this.findRole(this.searchOption)
+              } else {
+                this.$Message.error(res.message)
+              }
+            },
+            // 取消删除
+            onCancel: () => {
+              this.$Message.info('取消删除！')
+            }
+          })
+        } else {
+          this.$Message.info('请选择需要删除的数据！')
+        }
+      },
+      // 批量选择
+      batchSelect(selection) {
+        this.delId.ids = ''
+        selection.forEach(row => {
+          if (this.delId.ids === '') {
+            this.delId.ids = row.id
+          } else {
+            this.delId.ids = this.delId.ids + ',' + row.id
+          }
+        })
+      },
+      // 页面翻页
+      handlePageTurn(page) {
+        this.searchOption.page = page
+        this.findRole(this.searchOption)
       },
     }
   }
