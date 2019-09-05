@@ -41,17 +41,7 @@ export const adminColumns = [
       }
       return h('span', [str])
     }
-  },
-  {
-    title: '使用状态',
-    align: 'center',
-    key: 'status',
-    render: (h, params) => {
-      return h('span', [
-        params.row.isEnable === 0 ? '禁用' : '正常'
-      ])
-    }
-  },
+  }
 ]
 
 //角色
@@ -135,7 +125,7 @@ export const customerInfoColumns = [
     }
   },
   {
-    title: '昵称',
+    title: '账号/手机',
     align: 'center',
     key: 'username'
   },
@@ -145,14 +135,14 @@ export const customerInfoColumns = [
     key: 'name'
   },
   {
-    title: '电话',
+    title: '年龄',
     align: 'center',
-    key: 'phone'
-  },
-  {
-    title: '出生年月',
-    align: 'center',
-    key: 'birthday'
+    render: (h, params) => {
+      let year = new Date().getFullYear()
+      let age = 0
+      if (params.row.birthYear < year) age = year - params.row.birthYear
+      return h('span', [age])
+    }
   },
   {
     title: '性别',
@@ -165,12 +155,17 @@ export const customerInfoColumns = [
     }
   },
   {
-    title: '使用状态',
+    title: '评分',
     align: 'center',
-    key: 'status',
+    key: 'grade'
+  },
+  {
+    title: '心脑血管疾病高危',
+    align: 'center',
+    key: 'highRisk',
     render: (h, params) => {
       return h('span', [
-        params.row.status === 0 ? '禁用' : '正常'
+        params.row.highRisk === 0 ? '否' : '是'
       ])
     }
   },
@@ -205,14 +200,14 @@ export const nurseInfoColumns = [
     }
   },
   {
+    title: '账号/电话',
+    align: 'center',
+    key: 'username'
+  },
+  {
     title: '姓名',
     align: 'center',
     key: 'name'
-  },
-  {
-    title: '电话',
-    align: 'center',
-    key: 'phone'
   },
   {
     title: '性别',
@@ -225,27 +220,17 @@ export const nurseInfoColumns = [
     }
   },
   {
+    title: '护士评分',
+    align: 'center',
+    key: 'grade'
+  },
+  {
     title: '资质状态',
     align: 'center',
     key: 'status',
     render: (h, params) => {
       return h('span', [
         params.row.status === 0 ? '未审核' : '已通过'
-      ])
-    }
-  },
-  {
-    title: '相关资质',
-    align: 'center',
-    key: 'label',
-  },
-  {
-    title: '使用状态',
-    align: 'center',
-    key: 'status2',
-    render: (h, params) => {
-      return h('span', [
-        params.row.status2 === 0 ? '禁用' : '正常'
       ])
     }
   },
@@ -315,7 +300,7 @@ export const ordersInfoColumns = [
   {
     title: '订单号',
     align: 'center',
-    key: 'orderNumber',
+    key: 'id',
     width: 150,
     fixed: 'left'
   },
@@ -323,13 +308,13 @@ export const ordersInfoColumns = [
     title: '客户姓名',
     align: 'center',
     width: 150,
-    key: 'customerName'
+    key: 'contact'
   },
   {
     title: '客户手机',
     align: 'center',
     width: 150,
-    key: 'phone'
+    key: 'contactPhone'
   },
   {
     title: '护理项目类型',
@@ -347,13 +332,13 @@ export const ordersInfoColumns = [
     title: '金额（￥）',
     align: 'center',
     width: 150,
-    key: 'price'
+    key: 'amount'
   },
   {
     title: '预约时间',
     align: 'center',
     width: 150,
-    key: 'addTime'
+    key: 'serviceTime'
   },
   {
     title: '接单护士',
@@ -377,7 +362,40 @@ export const ordersInfoColumns = [
     title: '订单状态',
     align: 'center',
     width: 150,
-    key: 'orderStatus'
+    key: 'orderStatus',
+    render: (h, params) => {
+      let str = ''
+      switch (params.row.orderStatus){
+        case 0:
+          str = '订单提交';
+          break;
+        case -1:
+          str = '订单拒绝';
+          break;
+        case -2:
+          str = '订单取消';
+          break;
+        case 1:
+          str = '订单支付完成';
+          break;
+        case 2:
+          str = '订单审核通过';
+          break;
+        case 3:
+          str = '订单已接单';
+          break;
+        case 4:
+          str = '订单处理中';
+          break;
+        case 5:
+          str = '订单完成，待评价';
+          break;
+        case 6:
+          str = '评价完成';
+          break;
+      }
+      return h('span', [str])
+    }
   },
 ]
 
@@ -420,6 +438,11 @@ export const healthTypesColumns = [
 //护理项目相关类型
 export const programTypesColumns = [
   {
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
     title: '类型名称',
     key: 'name'
   },
@@ -453,7 +476,11 @@ export const programColumns = [
   },
   {
     title: '项目类型',
-    key: 'type'
+    key: 'serviceType'
+  },
+  {
+    title: '需要护士（人）',
+    key: 'numberOfNurse'
   },
   {
     title: '价格（¥）',

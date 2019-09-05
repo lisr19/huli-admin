@@ -136,6 +136,7 @@
         ],
         resArray:[],//原始数据
         searchOption: {}, // 查询用参数
+        formCopy:{}
       }
     },
     created(){
@@ -166,12 +167,12 @@
         this.$refs.addForm.validate(async (valid) => { // 表单校验
           if (valid) { // 表单验证成功
             let form = this.addForm
-            console.log(form)
             if(form[`accessCas`]&&form.accessCas.length>0){
               form.pid = form.accessCas[form.accessCas.length-1]
             }else{
               form.pid = 0
             }
+            if(!form.type)form.type=0
             let res = await doFunctionAdd(form)
             if (res.code === 200) { // 添加成功
               this.$Message.success('添加成功')
@@ -190,8 +191,13 @@
         this.$refs.editForm.validate(async (valid) => { // 表单校验
           if (valid) { // 表单验证成功
             let form = this.editForm
+            if(form[`accessCas`]&&form.accessCas.length>0){
+              form.pid = form.accessCas[form.accessCas.length-1]
+            }else{
+              form.pid = 0
+            }
             let array = []
-            array = doFunctionEdit(form,this.formCopy)
+            array = ObjectContrast(form,this.formCopy)
             // console.log(array)
             if(array.length > 0){
               let data = {}
@@ -219,18 +225,32 @@
       doAccessDel(row){
         this.$Modal.confirm({
           title: '请确认删除',
-          content: `<p>删除数据: ${row.name} 后无法恢复,确认删除?</p>`,
+          content: `<p>删除数据: ${row.name} (包括其所有子类)后无法恢复,确认删除?</p>`,
           okText: '确认',
-          onOk: () => {
+          onOk: async() => {
             if (row[`children`]) { // 若是该数据有子类
               let ids = ''
               ids = row.id
               let idArray = []
               tools4Del(row.children, idArray)
               ids = ids + ',' + idArray.join(',')
+              let res = await doFunctionDelMany({ids:ids})
+              if (res.code === 200) {
+                this.$Message.success('删除成功')
+                this.findFunctionAll()
+              } else {
+                this.$Message.error(res.message)
+              }
               // console.log(ids)
             } else { // 若没有则删除单个
               let id = { id: row.id }
+              let res = await doFunctionDel(id)
+              if (res.code === 200) {
+                this.$Message.success('删除成功')
+                this.findFunctionAll()
+              } else {
+                this.$Message.error(res.message)
+              }
             }
           },
           // 取消删除
@@ -249,6 +269,7 @@
         let cas = []
         tools4Cas(this.resArray,parseInt(params.id),cas)
         params.accessCas = cas
+        this.formCopy = Object.assign({},params)
         this.editForm = params
         this.isEdit = true
       },

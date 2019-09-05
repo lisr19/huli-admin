@@ -60,16 +60,30 @@
         <Button type="primary" @click="doRoleEdit">确认</Button>
       </div>
     </Modal>
+
+    <!--权限Modal-->
+    <Modal v-model="isAccess" @on-cancel="cancelAccessModal" title="角色权限变更：" width="700">
+      <role-access ref="roleAccess"></role-access>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="text" @click="cancelAccessModal">取消</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
-  import {findRole,doRoleAdd,doRoleEdit,doRoleDel,doRoleDelMany} from "../../api/role";
+  import {findRole, doRoleAdd, doRoleEdit, doRoleDel, doRoleDelMany} from "../../api/role";
+  import {findFunctionAll} from "../../api/access";
   import {roleColumns} from '../../libs/table'
-  import {hasOneOf, array4tree,tools4Del,ObjectContrast} from '@/libs/tools'
+  import {hasOneOf, array4tree, tools4Del, ObjectContrast} from '@/libs/tools'
+  import roleAccess from './role-access'
 
   export default {
     name: "role",
+    components:{
+      roleAccess
+    },
     computed: {
       access() {
         return this.$store.state.user.access
@@ -103,6 +117,7 @@
       return {
         isAdd: false,
         isEdit: false,
+        isAccess:false,
         columns: [
           {
             title: '操作',
@@ -122,8 +137,7 @@
                     on: {
                       click: () => {
                         let data = Object.assign({}, params.row)
-                        // this.formCopy = Object.assign({}, data)
-                        // this.openEditModal(data)
+                        this.openAccessModal(data)
                       }
                     }
                   }, '权限'),
@@ -176,6 +190,7 @@
           }
         ],
         tableData: [],
+        accessData:[],
         addForm: {},
         editForm: {},
         rules: {
@@ -196,19 +211,20 @@
           total: 1, // 数据总数
           currentPage: 1// 当前页面
         },
-        formCopy:{},
+        formCopy: {},
         searchOption: {}, // 查询用参数
       }
     },
     created() {
       this.columns = roleColumns.concat(this.columns)
     },
-    mounted(){
+    mounted() {
       this.findRole()
+      this.findFunctionAll()
     },
     methods: {
       //查询
-      async findRole(params){
+      async findRole(params) {
         let res = await findRole(params)
         if (res.code === 200) {
           this.tableData = res.data.list
@@ -220,8 +236,20 @@
           this.$Message.error(res.data)
         }
       },
+      //查询
+      async findFunctionAll() {
+        let res = await findFunctionAll()
+        if (res.code === 200) {
+          this.accessData = array4tree((v) => {
+            v.value = v.id
+            v.label = v.name
+          }, res.data)
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
       //添加
-      async doRoleAdd(){
+      async doRoleAdd() {
         this.$refs.addForm.validate(async (valid) => { // 表单校验
           if (valid) { // 表单验证成功
             let form = this.addForm
@@ -239,16 +267,16 @@
         })
       },
       //编辑
-      async doRoleEdit(){
+      async doRoleEdit() {
         this.$refs.editForm.validate(async (valid) => { // 表单校验
           if (valid) { // 表单验证成功
             let form = this.editForm
             let array = []
-            array = ObjectContrast(form,this.formCopy)
+            array = ObjectContrast(form, this.formCopy)
             // console.log(array)
-            if(array.length > 0){
+            if (array.length > 0) {
               let data = {}
-              array.forEach(v=>{
+              array.forEach(v => {
                 data[v] = form[v]
               })
               data.id = form.id
@@ -260,7 +288,7 @@
               } else { // 添加失败
                 this.$Message.error(res.data)
               }
-            }else{
+            } else {
               this.$Message.error('表单没有修改')
             }
           } else {
@@ -292,6 +320,35 @@
         this.$refs.editForm.resetFields()// 重置表单
         this.editForm = {}
         this.isEdit = false
+      },
+      openAccessModal(params){
+        let functions = params.functions
+        let group = []
+        group = JSON.parse(JSON.stringify(this.accessData))
+        group.forEach(v => {
+          v.children.forEach(k => {
+            k.checkAll = false
+            k.checkAllGroup = []
+            k.oldCheckAllGroup = []
+            functions.forEach(j => {
+              if (j.pid.toString() === k.id) {
+                k.checkAllGroup.push(j.name)
+                if (k.checkAllGroup.length === k.children.length) { // 若全选
+                  k.checkAll = true
+                }
+              }
+            })
+            k.oldCheckAllGroup = k.checkAllGroup
+          })
+        })
+        this.$refs.roleAccess.roleId = params.id
+        this.$refs.roleAccess.group = group
+        this.isAccess = true
+      },
+      // 角色权限编辑modal关闭
+      cancelAccessModal() {
+        this.findRole()
+        this.isAccess = false
       },
       // 批量删除
       batchDel() {

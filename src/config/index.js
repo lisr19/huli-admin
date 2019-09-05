@@ -17,10 +17,10 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    dev: 'http://192.168.4.46:8899/',
+    dev: 'http://192.168.4.55:8899/',
     pro: 'https://produce.com'
   },
-  imgBaseUrl: 'http://192.168.4.46:8899/api/0.1/upload/img',
+  imgBaseUrl: 'http://192.168.4.55:8899/api/0.1/upload/img',
   tokenName:'nursingAdminToken',
   /**
    * @description 默认打开的首页的路由name值，默认为home

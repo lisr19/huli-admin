@@ -38,6 +38,7 @@
 </template>
 
 <script>
+  import {findOrder} from "../../api/orders";
   import {ordersInfoColumns} from "../../libs/table";
   import {hasOneOf, array4tree} from '@/libs/tools';
   import ordersDetail from './orders-detail'
@@ -156,7 +157,23 @@
     created(){
       this.columns = ordersInfoColumns.concat(this.columns)
     },
+    mounted(){
+      this.findOrder()
+    },
     methods:{
+      //查询
+      async findOrder(params){
+        let res = await findOrder(params)
+        if (res.code === 200) {
+          this.tableData = res.data.list
+          this.page = {
+            total: res.data.total,
+            currentPage: res.data.pageNum
+          }
+        } else {
+          this.$Message.error(res.message)
+        }
+      },
       // modal打开
       openModal (params) {
         this.detailData = params

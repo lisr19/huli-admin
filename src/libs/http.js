@@ -11,27 +11,6 @@ axios.defaults.baseURL = baseUrl;
 // http request 拦截器
 axios.interceptors.request.use(
   config => {
-    // 以下是token存于cookie的处理  del by allen 2018.5.30
-    // const token = getCookie('名称');注意使用的时候需要引入cookie方法，推荐js-cookie
-    //     config.data = JSON.stringify(config.data);
-
-    // if(token){
-    //   config.params = {'token':token}
-    //   config.headers.Authorization = token;
-    // }
-
-    // 判断请求方式是否为以下四种种
-    // if (config.method === 'get') {
-    //   // 序列化
-    //   // config.data = qs.stringify(config.data);
-    //   // 设置请求头的content-type
-    //   config.headers = {
-    //     'Accept-Encoding': 'gzip,deflate,br'
-    //     // 'Content-Type': 'application/json'
-    //     // 'Content-Type': 'multipart/form-data',
-    //     // 'Content-Type':'multipart/form-data'
-    //   };
-    // }
     let url = config.url
     // get参数编码
     if (config.method === 'get' && config.params) {
@@ -47,7 +26,7 @@ axios.interceptors.request.use(
     }
     config.url = url
     // 若是有token , 就给头部授权带上token
-    if (localStorage.hmAppToken) {
+    if (localStorage.getItem(config.tokenName)) {
       config.headers.authorization = localStorage.getItem(config.tokenName);
     }
     return config;
@@ -195,6 +174,35 @@ export function post4JSON(url, data) {
   };
   return new Promise((resolve, reject) => {
     axios.post(url, data, config)
+      .then(response => {
+        resolve(response);
+      }, err => {
+        reject(err);
+      });
+  });
+}
+
+/**
+ * 封装delete请求(JSON)
+ * @param url
+ * @param data
+ * @returns {Promise}
+ */
+
+export function del4JSON(url, data) {
+  // let config = {
+  //   data: '',
+  //   headers: {}
+  // }
+  data = qs.stringify(data);
+  // 序列化
+  // config.data = qs.stringify(data);
+  // 设置请求头的content-type
+  // config.headers = {
+  //   'Content-Type': 'application/json'
+  // };
+  return new Promise((resolve, reject) => {
+    axios.delete(url, {params: data})
       .then(response => {
         resolve(response);
       }, err => {

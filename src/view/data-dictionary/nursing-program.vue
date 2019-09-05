@@ -47,8 +47,8 @@
           </Select>
         </FormItem>
         <FormItem label="项目类型：">
-          <Select clearable v-model="addForm.type" placeholder="请选择项目类型" style="width: 100%">
-            <Option value="0" key="0">无</Option>
+          <Select clearable v-model="addForm.serviceType" placeholder="请选择项目类型" style="width: 100%">
+            <Option v-for="item in types" :value="item.id" :key="item.id">{{item.name}}</Option>
           </Select>
         </FormItem>
         <FormItem label="项目价格：" prop="price">
@@ -82,8 +82,8 @@
           </Select>
         </FormItem>
         <FormItem label="项目类型：">
-          <Select clearable v-model="editForm.type" placeholder="请选择项目类型" style="width: 100%">
-            <Option value="0" key="0">无</Option>
+          <Select clearable v-model="editForm.serviceType" placeholder="请选择项目类型" style="width: 100%">
+            <Option v-for="item in types" :value="item.id" :key="item.id">{{item.name}}</Option>
           </Select>
         </FormItem>
         <FormItem label="项目价格：" prop="price">
@@ -105,6 +105,7 @@
 </template>
 
 <script>
+  import {findNursingService,doNursingServiceAdd,doNursingServiceEdit,doNursingServiceDel,doNursingServiceDelMany,findNursingServiceType} from "../../api/nursing";
   import {programColumns} from "../../libs/table";
   import {hasOneOf, array4tree,tools4Del} from '@/libs/tools'
 
@@ -141,7 +142,7 @@
         isAdd: false,
         isEdit: false,
         columns: [],
-        tableData: [{}],
+        tableData: [],
         addForm: {},
         editForm: {},
         rules: {},
@@ -152,7 +153,33 @@
     created(){
       this.columns = programColumns
     },
+    mounted(){
+      this.findNursingService()
+      this.findNursingServiceType()
+    },
     methods:{
+      //查询
+      async findNursingService(params) {
+        let res = await findNursingService(params)
+        if (res.code === 200) {
+          this.tableData = res.data.list
+          this.page = {
+            total: res.data.total,
+            currentPage: res.data.pageNum
+          }
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
+      //查询
+      async findNursingServiceType() {
+        let res = await findNursingServiceType({size:100})
+        if (res.code === 200) {
+          this.types = res.data.list
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
       //项目删除
       doProgramDel(row){
         this.$Modal.confirm({

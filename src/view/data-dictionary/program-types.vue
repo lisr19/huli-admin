@@ -7,6 +7,9 @@
         <Col span="2">
           <Button type="primary" class="my-btn" v-if="viewAdd" @click="isAdd = true">添加</Button>
         </Col>
+        <Col span="2">
+          <Button type="error" class="my-btn" v-if="viewDelMany" @click="batchDel">批量删除</Button>
+        </Col>
       </Row>
     </Card>
 
@@ -34,7 +37,7 @@
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelAddModal">取消</Button>
-        <!--<Button type="primary" @click="doRoleAdd">确认</Button>-->
+        <Button type="primary" @click="doNursingServiceTypeAdd">确认</Button>
       </div>
     </Modal>
 
@@ -55,7 +58,10 @@
 </template>
 
 <script>
+  import {findNursingServiceType,doNursingServiceTypeAdd,doNursingServiceTypeEdit,doNursingServiceTypeDel,doNursingServiceTypeDelMany} from "../../api/nursing";
   import {programTypesColumns} from '../../libs/table'
+  import {ObjectContrast} from "../../libs/tools";
+
   export default {
     name: "program-types",
     computed: {
@@ -122,7 +128,7 @@
                           okText: '确认',
                           onOk: () => {
                             let id = {id: params.row.id}
-                            // this.doAdminDel(id)
+                            this.doNursingServiceTypeDel(id)
                           },
                           // 取消删除
                           onCancel: () => {
@@ -163,7 +169,108 @@
     created(){
       this.columns = programTypesColumns.concat(this.columns)
     },
+    mounted(){
+      this.findNursingServiceType()
+    },
     methods:{
+      //查询
+      async findNursingServiceType(params) {
+        let res = await findNursingServiceType(params)
+        if (res.code === 200) {
+          this.tableData = res.data.list
+          this.page = {
+            total: res.data.total,
+            currentPage: res.data.pageNum
+          }
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
+      //添加
+      async doNursingServiceTypeAdd() {
+        this.$refs.addForm.validate(async (valid) => { // 表单校验
+          if (valid) { // 表单验证成功
+            let form = this.addForm
+            let res = await doNursingServiceTypeAdd(form)
+            if (res.code === 200) { // 添加成功
+              this.$Message.success('添加成功')
+              this.findNursingServiceType(this.searchOption)
+              this.cancelAddModal()
+            } else { // 添加失败
+              this.$Message.error(res.data)
+            }
+          } else {
+            this.$Message.error('请正确填写表单')
+          }
+        })
+      },
+      //编辑
+      async doNursingServiceTypeEdit() {
+        this.$refs.editForm.validate(async (valid) => { // 表单校验
+          if (valid) { // 表单验证成功
+            let form = this.editForm
+            let array = []
+            array = ObjectContrast(form, this.formCopy)
+            // console.log(array)
+            if (array.length > 0) {
+              let data = {}
+              array.forEach(v => {
+                data[v] = form[v]
+              })
+              data.id = form.id
+              let res = await doNursingServiceTypeEdit(data)
+              if (res.code === 200) {
+                this.$Message.success('编辑成功')
+                this.findRole(this.searchOption)
+                this.cancelEditModal()
+              } else { // 添加失败
+                this.$Message.error(res.data)
+              }
+            } else {
+              this.$Message.error('表单没有修改')
+            }
+          } else {
+            this.$Message.error('请正确填写表单')
+          }
+        })
+      },
+      // 删除
+      async doNursingServiceTypeDel(params) {
+        let res = await doNursingServiceTypeDel(params)
+        if (res.code === 200) {
+          this.$Message.success('删除成功')
+          this.findNursingServiceType(this.searchOption)
+        } else {
+          this.$Message.error(res.data)
+        }
+      },
+      // 批量删除
+      batchDel() {
+        if (this.delId.ids) {
+          this.$Modal.confirm({ // 打开确认对话框
+            title: '请确认删除',
+            content: `<p>删除数据后无法恢复,确认删除?</p>`,
+            okText: '确认',
+            // 确认删除
+            onOk: async () => {
+              let res = await doNursingServiceTypeDelMany(this.delId)
+              if (res.code === 200) {
+                this.$Message.success('删除成功')
+                this.delId.ids = ''
+                this.findNursingServiceType(this.searchOption)
+              } else {
+                this.$Message.error(res.message)
+              }
+            },
+            // 取消删除
+            onCancel: () => {
+              this.$Message.info('取消删除！')
+            }
+          })
+        } else {
+          this.$Message.info('请选择需要删除的数据！')
+        }
+      },
       cancelAddModal(){
         this.$refs.addForm.resetFields()// 重置表单
         this.addForm = {}

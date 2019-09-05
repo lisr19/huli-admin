@@ -89,11 +89,39 @@
         <Button type="primary" @click="doManagerEdit">确认</Button>
       </div>
     </Modal>
+
+    <!--角色添加-->
+    <Modal v-model="isRole" :mask-closable="false" :closable="false" title="角色编辑："  width="600">
+      <Card>
+        <p slot="title">角色：</p>
+        <Row>
+          <Col span="12">
+            <Select clearable v-model="roleForm.roleId">
+              <Option v-for="item in roleData" :value="item.id">{{item.name}}</Option>
+            </Select>
+          </Col>
+          <Col span="4" offset="1">
+            <Button type="primary" @click="doManagerRoleRelAdd">添加</Button>
+          </Col>
+        </Row>
+      </Card>
+      <Card>
+        <p slot="title">已有角色</p>
+        <Tag type="border" closable color="default" v-for="(item,index) in roleArray" :key="item.id"
+        :name="item.name" @on-close="doManagerRoleRelDel(item.id,index)">{{item.name}}
+        </Tag>
+      </Card>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="text" @click="cancelRoleModal">取消</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
-  import {findManager,doManagerAdd,doManagerEdit,doManagerDel,doManagerDelMany} from "../../api/manager";
+  import {findManager,doManagerAdd,doManagerEdit,doManagerDel,doManagerDelMany,doManagerRoleRelAdd,doManagerRoleRelDel} from "../../api/manager";
+  import {findRoleAll} from "../../api/role";
 
   import {adminColumns} from '../../libs/table'
   import {adminRules} from "../../libs/rules";
@@ -154,10 +182,50 @@
       return {
         isAdd:false,
         isEdit:false,
+        isRole:false,
         columns: [
+          {
+            title: '使用状态',
+            align: 'center',
+            render: (h, params) => {
+              return h('div', [
+                h('i-switch', {
+                  props: {
+                    value: params.row.isEnable === 1 ? true : false,
+                  },
+                  style: {
+                    marginRight: '10px',
+                    display: this.viewEdit ? 'inline-block' : 'none'
+                  },
+                  on: {
+                    "on-change": async (v) => {
+                      let data = {};
+                      data.id = params.row.id ;
+                      if(v){
+                        data.isEnable = 1;
+                      }else{
+                        data.isEnable = 0;
+                      }
+                      let res = await doManagerEdit(data)
+                      if (res.code === 200) {
+                        this.$Message.success('变更成功')
+                        this.findManager(this.searchOption)
+                      } else { // 添加失败
+                        this.$Message.error(res.data)
+                      }
+                    }
+                  }
+                }),
+                h('span', [
+                  params.row.isEnable === 0 ? '禁用' : '正常'
+                ])
+              ])
+            }
+          },
           {
             title: '操作',
             align: 'center',
+            width:300,
             key: 'handle',
             render: (h, params) => {
               if (this.viewRole || this.viewEdit || this.viewDel) {
@@ -173,8 +241,7 @@
                     on: {
                       click: () => {
                         let data = Object.assign({}, params.row)
-                        // this.formCopy = Object.assign({}, data)
-                        // this.openEditModal(data)
+                        this.openRoleModal(data)
                       }
                     }
                   }, '角色'),
@@ -227,8 +294,11 @@
           }
         ],
         tableData: [],
+        roleData:[],
+        roleArray:[],
         addForm:{},
         editForm:{},
+        roleForm:{},
         addRules:{
           rePassword: [{ validator: validatePassCheck, trigger: 'blur' },{ required: true, message: '密码不能为空', trigger: 'blur' }],
         },
@@ -249,12 +319,20 @@
     },
     created() {
       this.columns = adminColumns.concat(this.columns)
-      this.addRules = Object.assign(this.addRules, adminRules)
-      this.addRules.password.push({ required: true, message: '密码不能为空', trigger: 'blur' })
-      this.editRules = Object.assign(this.editRules, adminRules)
+      this.addRules = Object.assign(this.addRules,adminRules)
+      this.addRules.password = [
+        {
+          pattern: /^[^~# $……^。，；：“”‘’{}()[`%*&|+<>/,.;:'"=\]\\]{6,20}$/,
+          message: '密码格式不正确,密码由6-20位大小写字母、数字、符号：?、!、@组成',
+          trigger: 'blur'
+        },
+        {required: true, message: '密码不能为空', trigger: 'blur'}
+      ]
+      this.editRules = Object.assign(this.editRules,adminRules)
     },
     mounted(){
       this.findManager()
+      this.findRoleAll()
     },
     methods: {
       //查询
@@ -267,7 +345,16 @@
             currentPage: res.data.pageNum
           }
         } else {
-          this.$Message.error(res.data)
+          this.$Message.error(res.message)
+        }
+      },
+      //查询
+      async findRoleAll(){
+        let res = await findRoleAll()
+        if (res.code === 200) {
+          this.roleData = res.data
+        } else {
+          this.$Message.error(res.message)
         }
       },
       //添加
@@ -281,7 +368,7 @@
               this.findManager(this.searchOption)
               this.cancelAddModal()
             } else { // 添加失败
-              this.$Message.error(res.data)
+              this.$Message.error(res.message)
             }
           } else {
             this.$Message.error('请正确填写表单')
@@ -325,7 +412,35 @@
           this.$Message.success('删除成功')
           this.findManager(this.searchOption)
         } else {
-          this.$Message.error(res.data)
+          this.$Message.error(res.message)
+        }
+      },
+      //添加角色
+      async doManagerRoleRelAdd(){
+        if(this.roleForm[`roleId`] && this.roleForm != null){
+          let res = await doManagerRoleRelAdd(this.roleForm)
+          if (res.code === 200) {
+            this.$Message.success('添加成功')
+            this.roleData.forEach(v=>{
+              if(v.id === this.roleForm.roleId)this.roleArray.push(v)
+            })
+          } else {
+            this.$Message.error(res.message)
+          }
+        }
+      },
+      // 删除角色
+      async doManagerRoleRelDel (roleId, index) {
+        let data = {
+          roleId: roleId,
+          managerId: this.roleForm.managerId
+        }
+        let res = await doManagerRoleRelDel(data)
+        if (res.code === 200) {
+          this.$Message.success('删除成功')
+          this.roleArray.splice(index, 1)
+        } else {
+          this.$Message.error(res.message)
         }
       },
       // 批量删除
@@ -369,6 +484,17 @@
         this.$refs.editForm.resetFields()// 重置表单
         this.editForm = {}
         this.isEdit = false
+      },
+      openRoleModal(params){
+        this.roleForm.managerId  = params.id
+        this.roleArray = params.roles
+        this.isRole = true
+      },
+      cancelRoleModal(){
+        this.isRole = false
+        this.roleArray = []
+        this.roleForm = {}
+        this.findManager(this.searchOption)
       },
       // 批量选择
       batchSelect(selection) {

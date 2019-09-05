@@ -29,3 +29,13 @@ export function doManagerDel (params) {
 export function doManagerDelMany (params) {
   return del('manager/deleteMany', params)
 }
+
+// 管理员角色增加
+export function doManagerRoleRelAdd (params) {
+  return post('managerRoleRel/add', params)
+}
+
+// 管理员角色删除
+export function doManagerRoleRelDel (params) {
+  return del('managerRoleRel/del', params)
+}

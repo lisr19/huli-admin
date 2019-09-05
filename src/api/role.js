@@ -1,4 +1,4 @@
-import { fetch, post, patch, del } from '../libs/http'
+import { fetch, post, patch, del ,post4JSON} from '../libs/http'
 
 // 角色列表
 export function findRole (params) {
@@ -28,4 +28,13 @@ export function doRoleDel (params) {
 // 角色删除(多个)
 export function doRoleDelMany (params) {
   return del('role/deleteMany', params)
+}
+
+// 角色权限添加(多个)
+export function doRoleAccessRelAddMany (params) {
+  return post4JSON('roleFunctionRel/addMany', params)
+}
+// 角色权限删除（多个）
+export function doRoleAccessRelDelMany (params) {
+  return del('roleFunctionRel/deleteMany', params)
 }
