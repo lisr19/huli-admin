@@ -2,7 +2,7 @@
   <div>
     <div class="demo-upload-list" v-for="item in uploadList">
       <template v-if="item.status === 'finished'">
-        <img :src="'http://'+item.url">
+        <img :src="item.url">
         <div class="demo-upload-list-cover">
           <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
           <Icon type="ios-trash-outline" @click.native="handleRemove(item,index)"></Icon>
@@ -32,7 +32,7 @@
       </div>
     </Upload>
     <Modal title="上传的图片" v-model="visible" style="z-index: 666">
-      <img :src="'http://'+uploadList[0].url" v-if="visible" style="width: 100%">
+      <img :src="uploadList[0].url" v-if="visible" style="width: 100%">
       <div slot="footer">
       </div>
     </Modal>
@@ -45,7 +45,7 @@
     name: 'imgUpload',
     data() {
       return {
-        myHeader: {authorization: localStorage.hmAppToken},
+        myHeader: {authorization: localStorage.getItem(Config.tokenName)},
         imgName: '',
         visible: false,
         uploadList: [],

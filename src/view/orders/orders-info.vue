@@ -9,7 +9,7 @@
         </Col>
 
         <Col span="2">
-          <Button type="error" class="my-btn" v-if="viewDelMany">批量删除</Button>
+          <!--<Button type="error" class="my-btn" v-if="viewDelMany">批量删除</Button>-->
         </Col>
       </Row>
     </Card>
@@ -58,7 +58,7 @@
       },
       viewEdit() {
         // return hasOneOf(['nurse-edit'], this.access)
-        return true
+        return false
       },
       viewDel() {
         // return hasOneOf(['nurse-del'], this.access)
@@ -83,64 +83,63 @@
         isEdit:false,
         isDetail:false,
         columns: [
-          {
-            title: '操作',
-            align: 'center',
-            fixed: 'right',
-            key: 'handle',
-            width:300,
-            render: (h, params) => {
-              if (this.viewEdit || this.viewDel) {
-                return h('div', [
-                  h('Button', {
-                    props: {
-                      type: 'primary'
-                    },
-                    style: {
-                      marginRight: '5px',
-                      display: this.viewEdit ? 'inline-block' : 'none'
-                    },
-                    on: {
-                      click: () => {
-                        let data = Object.assign({}, params.row)
-                        // this.formCopy = Object.assign({}, data)
-                        this.openModal(data)
-                      }
-                    }
-                  }, '编辑'),
-                  h('Button', {
-                    props: {
-                      type: 'error'
-                    },
-                    style: {
-                      display: this.viewDel ? 'inline-block' : 'none'
-                    },
-                    on: {
-                      click: () => {
-                        this.$Modal.confirm({
-                          title: '请确认删除',
-                          content: `<p>删除数据: ${params.row.name} 后无法恢复,确认删除?</p>`,
-                          okText: '确认',
-                          onOk: () => {
-                            let id = {id: params.row.id}
-                            // this.doAdminDel(id)
-                          },
-                          // 取消删除
-                          onCancel: () => {
-                            this.$Message.info('取消删除！')
-                          }
-                        })
-                      }
-                    }
-                  }, '删除')
-                ])
-              } else {
-                return h('span', '您没有操作该数据的权限')
-              }
-            }
-          }
+          // {
+          //   title: '操作',
+          //   align: 'center',
+          //   fixed: 'right',
+          //   key: 'handle',
+          //   render: (h, params) => {
+          //     if (this.viewEdit || this.viewDel) {
+          //       return h('div', [
+          //         h('Button', {
+          //           props: {
+          //             type: 'primary'
+          //           },
+          //           style: {
+          //             marginRight: '5px',
+          //             display: this.viewEdit ? 'inline-block' : 'none'
+          //           },
+          //           on: {
+          //             click: () => {
+          //               let data = Object.assign({}, params.row)
+          //               // this.formCopy = Object.assign({}, data)
+          //               this.openModal(data)
+          //             }
+          //           }
+          //         }, '编辑'),
+          //         h('Button', {
+          //           props: {
+          //             type: 'error'
+          //           },
+          //           style: {
+          //             display: this.viewDel ? 'inline-block' : 'none'
+          //           },
+          //           on: {
+          //             click: () => {
+          //               this.$Modal.confirm({
+          //                 title: '请确认删除',
+          //                 content: `<p>删除数据: ${params.row.name} 后无法恢复,确认删除?</p>`,
+          //                 okText: '确认',
+          //                 onOk: () => {
+          //                   let id = {id: params.row.id}
+          //                   // this.doAdminDel(id)
+          //                 },
+          //                 // 取消删除
+          //                 onCancel: () => {
+          //                   this.$Message.info('取消删除！')
+          //                 }
+          //               })
+          //             }
+          //           }
+          //         }, '删除')
+          //       ])
+          //     } else {
+          //       return h('span', '您没有操作该数据的权限')
+          //     }
+          //   }
+          // }
         ],
-        tableData: [{}],
+        tableData: [],
         detailData:{},
         rules:{},
         // 批量选择的id对象

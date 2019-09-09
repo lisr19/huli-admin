@@ -100,6 +100,7 @@ export const nurseInfoRules = {
       trigger: 'blur'
     }
   ],
+  workYears:[{ pattern: /^([1-9][0-9]*)+(.[0-9]{1,3})?$/, message: '请填写数字', trigger: 'blur' }],
   email: [
     {
       pattern: /^[A-Za-z0-9]+([._\\-]*[A-Za-z0-9])*@([A-Za-z0-9]+[-A-Za-z0-9]*[A-Za-z0-9]+.){1,63}[A-Za-z0-9]+$/,
@@ -118,4 +119,13 @@ export const nurseInfoRules = {
       trigger: 'blur'
     }
   ]
+}
+
+export const nursingProgramRules = {
+  name: [{ required: true, message: '名称不能为空', trigger: 'blur' }],
+  price:[{ required: true, message: '价格不能为空', trigger: 'blur' },
+    { pattern: /^([1-9][0-9]*)+(.[0-9]{1,3})?$/, message: '请填写数字', trigger: 'blur' }
+  ],
+  content :[{ required: true, message: '内容不能为空', trigger: 'blur' }],
+  serviceType: [{ required: true, type:'number',message: '类型不能为空', trigger: 'blur' }]
 }

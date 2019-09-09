@@ -60,6 +60,17 @@
           <FormItem label="评分：">
             <InputNumber v-model="addForm.grade" :max="500" :min="1"></InputNumber>
           </FormItem>
+          <FormItem label="工作医院：" prop="hospital">
+            <Input clearable v-model="addForm.hospital" placeholder="请填写工作医院"/>
+          </FormItem>
+          <FormItem label="工作科室：" prop="department">
+            <Input clearable v-model="addForm.department" placeholder="请填写工作科室"/>
+          </FormItem>
+          <FormItem label="工作年限：" prop="workYears">
+            <Input clearable v-model="addForm.workYears" placeholder="请填写工作年限">
+            <span slot="append">年</span>
+            </Input>
+          </FormItem>
           <FormItem label="紧急联系人：" prop="emergencyContact">
             <Input clearable v-model="addForm.emergencyContact" placeholder="请填写紧急联系人"/>
           </FormItem>
@@ -68,7 +79,7 @@
           </FormItem>
           <FormItem label="提供服务区域：" prop="serviceArea">
             <Select v-model="addForm.serviceArea" multiple style="width:260px">
-              <Option v-for="item in serviceAreaData" :value="item.id" :key="item.id">{{ item.itemName }}</Option>
+              <Option v-for="item in serviceAreaData" :value="item.itemName" :key="item.id">{{ item.itemName }}</Option>
             </Select>
           </FormItem>
           <FormItem label="密码：" prop="password">
@@ -118,6 +129,17 @@
           <FormItem label="评分：">
             <InputNumber v-model="editForm.grade" :max="500" :min="1"></InputNumber>
           </FormItem>
+          <FormItem label="工作医院：" prop="hospital">
+            <Input clearable v-model="editForm.hospital" placeholder="请填写工作医院"/>
+          </FormItem>
+          <FormItem label="工作科室：" prop="department">
+            <Input clearable v-model="editForm.department" placeholder="请填写工作科室"/>
+          </FormItem>
+          <FormItem label="工作年限：" prop="workYears">
+            <Input clearable v-model="editForm.workYears" placeholder="请填写工作年限">
+            <span slot="append">年</span>
+            </Input>
+          </FormItem>
           <FormItem label="紧急联系人：" prop="emergencyContact">
             <Input clearable v-model="editForm.emergencyContact" placeholder="请填写紧急联系人"/>
           </FormItem>
@@ -126,7 +148,7 @@
           </FormItem>
           <FormItem label="提供服务区域：" prop="serviceArea">
             <Select v-model="editForm.serviceArea" multiple style="width:260px">
-              <Option v-for="item in serviceAreaData" :value="item.id" :key="item.id">{{ item.itemName }}</Option>
+              <Option v-for="item in serviceAreaData" :value="item.itemName" :key="item.id">{{ item.itemName }}</Option>
             </Select>
           </FormItem>
           <FormItem label="密码：" prop="password">
@@ -233,25 +255,6 @@
         detailStatus: true,
         columns: [
           {
-            title: '服务区域',
-            align: 'center',
-            render: (h, params) => {
-              let arr = params.row.serviceArea.split(',')
-              let strArray = []
-              for (let i = 0; i < arr.length; i++) {
-                for (let j = 0; j < this.serviceAreaData.length; j++) {
-                  if (this.serviceAreaData[j].id == arr[i]) {
-                    strArray.push(this.serviceAreaData[j].itemName)
-                    break;
-                  }
-                }
-              }
-              return h('div', [
-                strArray.join(',')
-              ])
-            }
-          },
-          {
             title: '使用状态',
             align: 'center',
             render: (h, params) => {
@@ -273,7 +276,7 @@
                       } else {
                         data.status = 0;
                       }
-                      let res = await doUserEdit(data)
+                      let res = await doNurseEdit(data)
                       if (res.code === 200) {
                         this.$Message.success('变更成功')
                         this.findNurse(this.searchOption)
@@ -284,7 +287,7 @@
                   }
                 }),
                 h('span', [
-                  params.row.isEnable === 0 ? '禁用' : '正常'
+                  params.row.status === 0 ? '禁用' : '正常'
                 ])
               ])
             }
@@ -448,14 +451,14 @@
             }
             delete form.birth
             delete form.rePassword
-            // console.log(form)
+            console.log(form)
             let res = await doNurseAdd(form)
             if (res.code === 200) { // 添加成功
               this.$Message.success('添加成功')
               this.findNurse(this.searchOption)
               this.cancelAddModal()
             } else { // 添加失败
-              this.$Message.error('添加失败')
+              this.$Message.error(res.message)
             }
           } else {
             this.$Message.error('请正确填写表单')
@@ -490,7 +493,7 @@
                 this.findNurse(this.searchOption)
                 this.cancelEditModal()
               } else { // 添加失败
-                this.$Message.error(res.data)
+                this.$Message.error(res.message)
               }
             } else {
               this.$Message.error('表单没有修改')
@@ -554,11 +557,20 @@
       },
       // 编辑modal打开
       openEditModal(params) {
+        if (params[`avatar`] && params.avatar !== '') {
+          let list = []
+          list.push({
+            url: params.avatar,
+            name: '图片',
+            status: 'finished'
+          })
+          this.$refs.imgUploadByEdit.updateImgUrl(list)
+        }
         params.birth = params.birthYear + '-' + params.birthMonth + '-' + params.birthDay
         let array = params.serviceArea.split(',')
         params.serviceArea = []
         array.forEach(v=>{
-          params.serviceArea.push(parseInt(v))
+          params.serviceArea.push(v)
         })
         this.editForm = params
         this.isEdit = true

@@ -491,6 +491,15 @@
       // 编辑modal打开
       openEditModal(params) {
         // console.log(params)
+        if (params[`avatar`] && params.avatar !== '') {
+          let list = []
+          list.push({
+            url: params.avatar,
+            name: '头像',
+            status: 'finished'
+          })
+          this.$refs.imgUploadByEdit.updateImgUrl(list)
+        }
         params.birth = params.birthYear + '-' + params.birthMonth + '-' + params.birthDay
         this.editForm = params
         this.isEdit = true

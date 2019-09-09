@@ -53,3 +53,30 @@ export function doNursingServiceDel (params) {
 export function doNursingServiceDelMany (params) {
   return del('nursingService/deleteMany', params)
 }
+
+
+
+// 子护理服务列表
+export function findNursingServiceDetail(params) {
+  return fetch('nursingServiceDetail/list', params)
+}
+
+// 子护理服务添加
+export function doNursingServiceDetailAdd (params) {
+  return post('nursingServiceDetail/add', params)
+}
+
+// 子护理服务编辑
+export function doNursingServiceDetailEdit (params) {
+  return patch('nursingServiceDetail/update', params)
+}
+
+// 子护理服务删除
+export function doNursingServiceDetailDel (params) {
+  return del('nursingServiceDetail/del', params)
+}
+
+// 子护理服务删除(多个)
+export function doNursingServiceDetailDelMany (params) {
+  return del('nursingServiceDetail/deleteMany', params)
+}

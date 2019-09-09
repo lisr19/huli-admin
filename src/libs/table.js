@@ -220,19 +220,14 @@ export const nurseInfoColumns = [
     }
   },
   {
-    title: '护士评分',
+    title: '工作年限(年)',
     align: 'center',
-    key: 'grade'
+    key: 'workYears'
   },
   {
-    title: '资质状态',
+    title: '服务区域',
     align: 'center',
-    key: 'status',
-    render: (h, params) => {
-      return h('span', [
-        params.row.status === 0 ? '未审核' : '已通过'
-      ])
-    }
+    key: 'serviceArea'
   },
 ]
 //待审护士信息
@@ -307,61 +302,54 @@ export const ordersInfoColumns = [
   {
     title: '客户姓名',
     align: 'center',
-    width: 150,
     key: 'contact'
   },
   {
     title: '客户手机',
     align: 'center',
-    width: 150,
     key: 'contactPhone'
-  },
-  {
-    title: '护理项目类型',
-    align: 'center',
-    width: 150,
-    key: 'nursingType'
   },
   {
     title: '护理服务',
     align: 'center',
-    width: 150,
-    key: 'nursing'
+    key: 'nursingServiceName'
+  },
+  {
+    title: '服务地址',
+    align: 'center',
+    key: 'serviceAddress'
   },
   {
     title: '金额（￥）',
     align: 'center',
-    width: 150,
     key: 'amount'
   },
   {
     title: '预约时间',
     align: 'center',
-    width: 150,
     key: 'serviceTime'
   },
   {
     title: '接单护士',
     align: 'center',
-    width: 150,
-    key: 'nurseName'
-  },
-  {
-    title: '审核状态',
-    align: 'center',
-    width: 150,
-    key: 'credentialsStatus'
-  },
-  {
-    title: '审核结果',
-    align: 'center',
-    width: 150,
-    key: 'credentialsResult'
+    key: 'nurses',
+    render:(h,params)=>{
+      let str = ''
+      if(params.row.nurseList.length>0){
+        params.row.nurseList.forEach(v=>{
+          if(str !== ''){
+            str = str + ',' +v.name
+          }else{
+            str = v.name
+          }
+        })
+      }
+      return h('span', [str])
+    }
   },
   {
     title: '订单状态',
     align: 'center',
-    width: 150,
     key: 'orderStatus',
     render: (h, params) => {
       let str = ''
@@ -451,12 +439,19 @@ export const programTypesColumns = [
 //护理项目
 export const programColumns = [
   {
-    title: '项目名称',
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
+    title: '服务名称',
+    align: 'center',
     key: 'name'
   },
   {
-    title: '项目图片',
-    key: 'imgUrl',
+    title: '服务图片',
+    align: 'center',
+    key: 'picUrl',
     render: (h, params) => {
       return h('img', {
         style: {
@@ -467,34 +462,66 @@ export const programColumns = [
           borderRadius: '5px'
         },
         attrs: {
-          src: params.row['imgUrl']
-            ? params.row['imgUrl'] + '?imageView2/1/w/45/h/45'
+          src: params.row['picUrl']
+            ? params.row['picUrl'] + '?imageView2/1/w/45/h/45'
             : 'http://sdcmi.halohealth.cn/images/1552373693998.jpg'
         }
       })
     }
   },
   {
-    title: '项目类型',
-    key: 'serviceType'
-  },
-  {
     title: '需要护士（人）',
+    align: 'center',
     key: 'numberOfNurse'
   },
   {
     title: '价格（¥）',
+    align: 'center',
+    key: 'price',
+    render: (h, params) => {
+      return h('span', [
+        params.row.hasChild === 1 ? '/' : params.row.price
+      ])
+    }
+  },
+  {
+    title: '有子服务',
+    align: 'center',
+    key: 'hasChild',
+    render: (h, params) => {
+      return h('span', [
+        params.row.hasChild === 0 ? '否' : '有'
+      ])
+    }
+  },
+  {
+    title: '常用项目',
+    align: 'center',
+    key: 'common',
+    render: (h, params) => {
+      return h('span', [
+        params.row.common === 0 ? '否' : '是'
+      ])
+    }
+  }
+]
+
+//护理子项目
+export const programChildColumns = [
+  {
+    type: 'selection',
+    width: 60,
+    align: 'center'
+  },
+  {
+    title: '服务名称',
+    align: 'center',
+    key: 'name'
+  },
+  {
+    title: '价格（¥）',
+    align: 'center',
     key: 'price'
-  },
-  {
-    title: '层级',
-    key: 'level'
-  },
-  {
-    title: '操作',
-    key: 'action',
-    type: 'template',
-    template: 'action'
   }
 ]
 
