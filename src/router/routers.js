@@ -386,25 +386,54 @@ export default [
     ]
   },
   {
-    path: '/sos_index',
-    name: 'sos_index',
-    component: Main,
-    meta: {
-      title: '紧急求助',
-      showAlways: true
-    },
-    children: [
+		path: '/sos_index',
+		name: 'sos_index',
+		component: Main,
+		meta: {
+			title: '紧急求助',
+			showAlways: true
+		},
+		children: [
+			{
+				path: '/sos',
+				name: 'sos',
+				meta: {
+					title: '求助列表',
+					icon: 'md-home'
+				},
+				component: () => import('@/view/sos/sos')
+			}
+		]
+	},
+	{
+		path: '/wq_index',
+		name: 'wq_index',
+		component: Main,
+		meta: {
+			title: '抗疫登记',
+			showAlways: true
+		},
+		children: [
+			{
+				path: '/wq',
+				name: 'wq',
+				meta: {
+					title: '登记列表',
+					icon: 'md-home'
+				},
+				component: () => import('@/view/wq/wq')
+			},
       {
-        path: '/sos',
-        name: 'sos',
+        path: '/nakcheck',
+        name: 'nakcheck',
         meta: {
-          title: '求助列表',
+          title: '核酸检测结果',
           icon: 'md-home'
         },
-        component: () => import('@/view/sos/sos')
+        component: () => import('@/view/wq/nakcheck')
       }
-    ]
-  },
+		]
+	},
   // {
   //   path: '',
   //   name: 'doc',

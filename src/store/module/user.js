@@ -126,8 +126,10 @@ export default {
 			            roles.push(v.name)
 		            })
 	            }
-
-	            console.log(access)
+	          if(data.managerInfo.hospital){
+		          localStorage.setItem('hospital', data.managerInfo.hospital)
+	          }
+	          console.log(access)
 	            // let roles = data.managerInfo.roles
 	            console.log(roles)
 	            localStorage.setItem('access', access)
@@ -145,6 +147,7 @@ export default {
               commit('setNursingAdminToken', data.token)
               commit('setNursingAdminInfo', info)
               commit('setHasGetInfo', true)
+              localStorage.setItem('userId', info.id)
             }
           }
           resolve(res)
@@ -159,6 +162,8 @@ export default {
       commit('setNursingAdminToken', '')
       commit('setNursingAdminInfo', null)
       commit('setAccess', [])
+      localStorage.clear()
+
 
       // resolve()
       // })

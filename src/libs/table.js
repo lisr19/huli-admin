@@ -765,3 +765,95 @@ export const sosColumns = [
     }
   }
 ]
+
+export const wqColumns = [
+	// {
+	// 	type: 'selection',
+	// 	width: 60,
+	// 	align: 'center'
+	// },
+	{
+		title: '姓名',
+		align: 'center',
+		key: 'name'
+	},
+	{
+		title: '地址',
+		align: 'center',
+		key: 'address'
+	},
+	{
+		title: '出生年月',
+		align: 'center',
+		key: 'birthYear'
+	},
+	{
+		title: '手机号',
+		align: 'center',
+		key: 'username'
+	},
+	{
+		title: '性别',
+		align: 'center',
+		key: 'gender',
+		render: (h, params) => {
+			return h('span', [
+				params.row.gender === 1 ? '男' : '女'
+			])
+		}
+	},
+]
+
+export const wqColumns2 = [
+	// {
+	// 	type: 'selection',
+	// 	width: 60,
+	// 	align: 'center'
+	// },
+	{
+		title: '姓名',
+		align: 'center',
+		key: 'name'
+	},
+	{
+		title: '地址',
+		align: 'center',
+		key: 'address'
+	},
+	{
+		title: '出生年月',
+		align: 'center',
+		key: 'birthYear'
+	},
+	{
+		title: '手机号',
+		align: 'center',
+		key: 'username'
+	},
+
+	{
+		title: '性别',
+		align: 'center',
+		key: 'gender',
+		render: (h, params) => {
+			return h('span', [
+				params.row.gender === 1 ? '男' : '女'
+			])
+		}
+	},
+  // {
+  //   title: '登记时间',
+  //   align: 'center',
+  //   key: 'addTime'
+  // },
+  // {
+  //   title: '是否已发送通知',
+  //   align: 'center',
+  //   key: 'ifSend',
+  //   render: (h, params) => {
+  //     return h('span', [
+  //       params.row.ifSend === 1 ? '已发送' : '未发送'
+  //     ])
+  //   }
+  // },
+]

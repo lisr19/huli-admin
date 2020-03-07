@@ -17,12 +17,14 @@ export default {
    * @description api请求基础路径
    */
   baseUrl: {
-    dev: 'http://120.78.215.17:8899/',
+    // dev: 'http://120.78.215.17:8899/',
+    dev: 'http://47.115.162.174:8899/',
     // pro: 'http://192.168.0.123:8899/',
-    pro: 'http://120.78.215.17:8899/'
+    // pro: 'http://120.78.215.17:8899/'
+    pro: 'http://47.115.162.174:8899'
   },
-  imgBaseUrl: 'http://120.78.215.17:8899/upload/img',
-  appBaseUrl: 'http://120.78.215.17:8899/upload/uploadLocal',
+  imgBaseUrl: 'http://47.115.162.174:8899/upload/img',
+  appBaseUrl: 'http://47.115.162.174:8899/upload/uploadLocal',
   tokenName: 'nursingAdminToken',
   /**
    * @description 默认打开的首页的路由name值，默认为home

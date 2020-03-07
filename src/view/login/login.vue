@@ -34,6 +34,7 @@ export default {
             this.$router.push({
               name: this.$config.homeName
             })
+
           }else{
             this.$Message.info('登录失败！该用户已被禁用')
           }
