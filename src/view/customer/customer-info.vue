@@ -57,8 +57,8 @@
           <FormItem label="邮箱：" prop="email">
             <Input clearable v-model="addForm.email" placeholder="请填写邮箱"/>
           </FormItem>
-          <FormItem label="出声年月日：" prop="birthday">
-            <DatePicker type="date" :options="disDate" format="yyyy-MM-dd" placeholder="请选择出声年月日"
+          <FormItem label="出生年月日：" prop="birthday">
+            <DatePicker type="date" :options="disDate" format="yyyy-MM-dd" placeholder="请选择出生年月日"
                         @on-change="v=>{addForm.birth=v}"
                         style="width: 100%"></DatePicker>
           </FormItem>
@@ -98,8 +98,8 @@
           <FormItem label="邮箱：" prop="email">
             <Input clearable v-model="editForm.email" placeholder="请填写邮箱"/>
           </FormItem>
-          <FormItem label="出声年月日：" prop="birthday">
-            <DatePicker type="date" ref="editDate" :options="disDate" v-model="editForm.birth" format="yyyy-MM-dd" placeholder="请选择出声年月日"
+          <FormItem label="出生年月日：" prop="birthday">
+            <DatePicker type="date" ref="editDate" :options="disDate" v-model="editForm.birth" format="yyyy-MM-dd" placeholder="请选择出生年月日"
                         style="width: 100%"></DatePicker>
           </FormItem>
           <FormItem label="评分：">

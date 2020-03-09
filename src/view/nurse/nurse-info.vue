@@ -60,8 +60,8 @@
           <FormItem label="身份证号码：" prop="idNumber">
             <Input clearable v-model="addForm.idNumber" placeholder="请填写身份证号码"/>
           </FormItem>
-          <FormItem label="出声年月日：" prop="birthday">
-            <DatePicker type="date" :options="disDate" format="yyyy-MM-dd" placeholder="请选择出声年月日"
+          <FormItem label="出生年月日：" prop="birthday">
+            <DatePicker type="date" :options="disDate" format="yyyy-MM-dd" placeholder="请选择出生年月日"
                         @on-change="v=>{addForm.birth=v}"
                         style="width: 100%"></DatePicker>
           </FormItem>
@@ -132,9 +132,9 @@
           <FormItem label="身份证号码：" prop="idNumber">
             <Input clearable v-model="editForm.idNumber" placeholder="请填写身份证号码"/>
           </FormItem>
-          <FormItem label="出声年月日：" prop="birthday">
+          <FormItem label="出生年月日：" prop="birthday">
             <DatePicker type="date" :options="disDate" ref="editDate" v-model="editForm.birth" format="yyyy-MM-dd"
-                        placeholder="请选择出声年月日"
+                        placeholder="请选择出生年月日"
                         style="width: 100%"></DatePicker>
           </FormItem>
           <FormItem label="评分：">

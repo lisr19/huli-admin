@@ -12,13 +12,26 @@ export function getRedList (params) {
 export function getDetail (params) {
 	return fetch('ncpQuestionnaire/list', params)
 }
-// 核酸检测列表
+
+// 未发送核酸检测列表
 export function getnakList (params) {
+  return fetch('natCheck/list1', params)
+}
+// 所有核酸检测列表
+export function getnakList2 (params) {
   return fetch('natCheck/list', params)
 }
+// 批量发送未
+export function batchSend (params) {
+  return post('natCheck/batchSend', params)
+}
+export function sendChoice (params) {
+  return post('natCheck/batchSendList', params)
+}
+
 // 导入
 export function batchImport (params) {
-  return post('natCheck/batchImport', params)
+  return post('natCheck/batchImport1', params)
 }
 // 统计列表
 export function getCountList (params) {
