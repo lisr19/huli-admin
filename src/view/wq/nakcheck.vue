@@ -1,81 +1,54 @@
 <template>
 	<div>
+
     <Card>
-      <Upload
-        ref="upload"
-        :headers="myHeader"
-        action="http://47.115.162.174:8899/natCheck/batchImport1"
-        name="file"
-        :show-upload-list="true"
-        :on-format-error="handleFormatError"
-        :on-success="handleSuccess"
-        :on-error="handleError"
-        :format ="['xlsx','xls']">
-        <Button type="info" icon="ios-cloud-upload-outline">批量导入</Button>
-      </Upload>
-      <Button type="warning" @click="sendAll" style="margin: 0 15px">批量发送所有未发送</Button>
-      <Button type="error" @click="batchSend">选择发送</Button>
-      <Card>
-        <div>
-          <Table :columns="columns" :data="tableData" border  @on-selection-change="batchSelect" disabled-hover
-          ></Table>
-        </div>
-        <div style="margin: 10px;overflow: hidden">
-          <div style="float: right;">
-            <Page show-total show-elevator :total="page.total" :current="page.currentPage"
-                  @on-change="handlePageTurn"></Page>
-          </div>
-        </div>
-      </Card>
+      <Tabs>
+        <TabPane label="未发送用户" >
+          <Card>
+            <Upload
+              ref="upload"
+              :headers="myHeader"
+              action="http://47.115.162.174:8899/natCheck/batchImport1"
+              name="file"
+              :show-upload-list="true"
+              :on-format-error="handleFormatError"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :format ="['xlsx','xls']">
+              <Button type="info" icon="ios-cloud-upload-outline">批量导入</Button>
+            </Upload>
+            <Button type="warning" @click="sendAll" style="margin: 0 15px">批量发送所有未发送</Button>
+            <Button type="error" @click="batchSend">选择发送</Button>
+            <Card>
+              <div>
+                <Table :columns="columns" :data="tableData" border  @on-selection-change="batchSelect" disabled-hover
+                ></Table>
+              </div>
+              <div style="margin: 10px;overflow: hidden">
+                <div style="float: right;">
+                  <Page show-total show-elevator :total="page.total" :current="page.currentPage"
+                        @on-change="handlePageTurn"></Page>
+                </div>
+              </div>
+            </Card>
+          </Card>
+        </TabPane>
+        <TabPane label="所有用户" >
+          <Card>
+            <div>
+              <Table :columns="columns2" :data="tableData2" border
+              ></Table>
+            </div>
+            <div style="margin: 10px;overflow: hidden">
+              <div style="float: right;">
+                <Page show-total show-elevator :total="page2.total" :current="page2.currentPage"
+                      @on-change="handlePageTurn2"></Page>
+              </div>
+            </div>
+          </Card>
+        </TabPane>
+      </Tabs>
     </Card>
-<!--    <Card>-->
-<!--      <Tabs>-->
-<!--        <TabPane label="所有用户" >-->
-<!--          <Card>-->
-<!--            <div>-->
-<!--              <Table :columns="columns2" :data="tableData2" border-->
-<!--              ></Table>-->
-<!--            </div>-->
-<!--            <div style="margin: 10px;overflow: hidden">-->
-<!--              <div style="float: right;">-->
-<!--                <Page show-total show-elevator :total="page2.total" :current="page2.currentPage"-->
-<!--                      @on-change="handlePageTurn2"></Page>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--          </Card>-->
-<!--        </TabPane>-->
-<!--        <TabPane label="未发送用户" >-->
-<!--          <Card>-->
-<!--            <Upload-->
-<!--              ref="upload"-->
-<!--              :headers="myHeader"-->
-<!--              action="http://47.115.162.174:8899/natCheck/batchImport1"-->
-<!--              name="file"-->
-<!--              :show-upload-list="true"-->
-<!--              :on-format-error="handleFormatError"-->
-<!--              :on-success="handleSuccess"-->
-<!--              :on-error="handleError"-->
-<!--              :format ="['xlsx','xls']">-->
-<!--              <Button type="info" icon="ios-cloud-upload-outline">批量导入</Button>-->
-<!--            </Upload>-->
-<!--            <Button type="warning" @click="sendAll" style="margin: 0 15px">批量发送所有未发送</Button>-->
-<!--            <Button type="error" @click="batchSend">选择发送</Button>-->
-<!--            <Card>-->
-<!--              <div>-->
-<!--                <Table :columns="columns" :data="tableData" border  @on-selection-change="batchSelect" disabled-hover-->
-<!--                ></Table>-->
-<!--              </div>-->
-<!--              <div style="margin: 10px;overflow: hidden">-->
-<!--                <div style="float: right;">-->
-<!--                  <Page show-total show-elevator :total="page.total" :current="page.currentPage"-->
-<!--                        @on-change="handlePageTurn"></Page>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </Card>-->
-<!--          </Card>-->
-<!--        </TabPane>-->
-<!--      </Tabs>-->
-<!--    </Card>-->
 	</div>
 </template>
 

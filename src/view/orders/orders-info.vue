@@ -11,6 +11,10 @@
         <Col span="2">
           <!--<Button type="error" class="my-btn" v-if="viewDelMany">批量删除</Button>-->
         </Col>
+        <Col span="4" offset="20">
+          <Input clearable icon="search" v-model="searchByHosp" @on-change="handleSearchByHosp"
+                 placeholder="输入医院搜索"/>
+        </Col>
       </Row>
     </Card>
 
@@ -79,6 +83,8 @@
     },
     data(){
       return{
+        searchByHosp:'',
+        hospName:'',
         isAdd:false,
         isEdit:false,
         isDetail:false,
@@ -154,12 +160,27 @@
       }
     },
     created(){
+      this.hospital = localStorage.getItem('hospital')
+      if(this.hospital==1){
+        this.hospName = '南部战区总医院'
+      }else if(this.hospital==2){
+        this.hospName = '157医院'
+      }
       this.columns = ordersInfoColumns.concat(this.columns)
     },
     mounted(){
-      this.findOrder()
+      this.findOrder({hospital: this.hospName })
     },
     methods:{
+      handleSearchByHosp(){
+        if (this.searchByHosp) { // 判断搜索条件是否为空
+          this.searchOption.hospital = this.searchByHosp
+        } else { // 重置搜索内容
+          this.searchOption.hospital = ''
+        }
+        this.searchOption.page = 1 // 初始化页数
+        this.findOrder(this.searchOption)
+      },
       //查询
       async findOrder(params){
         let res = await findOrder(params)
@@ -197,6 +218,7 @@
       handlePageTurn(page) {
         console.log(page)
         this.searchOption.page = page
+        this.searchOption.hospital = this.hospName
         this.findOrder(this.searchOption)
       },
     }

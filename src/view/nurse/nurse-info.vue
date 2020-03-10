@@ -11,7 +11,11 @@
         <!--<Col span="2">-->
           <!--<Button type="error" class="my-btn" v-if="viewDelMany" @click="batchDel">批量删除</Button>-->
         <!--</Col>-->
-        <Col span="3" offset="15">
+        <Col span="3" offset="10">
+        <Input clearable icon="search" v-model="searchByHosp" @on-change="handleSearchByHosp"
+               placeholder="输入医院搜索"/>
+      </Col>
+        <Col span="3" offset="1">
           <Input clearable icon="search" v-model="searchByPhone" @on-change="handleSearchByPhone"
                  placeholder="输入账号/电话搜索"/>
         </Col>
@@ -19,6 +23,7 @@
           <Input clearable icon="search" v-model="searchByName" @on-change="handleSearchByName"
                  placeholder="输入护士名搜索"/>
         </Col>
+
       </Row>
     </Card>
 
@@ -269,6 +274,7 @@ export default {
       detailStatus: true,
       searchByName: '',
       searchByPhone: '',
+      searchByHosp: '',
       columns: [
         {
           title: '使用状态',
@@ -412,10 +418,17 @@ export default {
         total: 1, // 数据总数
         currentPage: 1// 当前页面
       },
-      searchOption: {} // 查询用参数
+      searchOption: {}, // 查询用参数
+      hospName:'',
     }
   },
   created () {
+    this.hospital = localStorage.getItem('hospital')
+    if(this.hospital==1){
+      this.hospName = '南部战区总医院'
+    }else if(this.hospital==2){
+      this.hospName = '157医院'
+    }
     this.columns = nurseInfoColumns.concat(this.columns)
     this.addRules = Object.assign(this.addRules, nurseInfoRules)
     this.addRules.password = [
@@ -427,7 +440,7 @@ export default {
       { required: true, message: '密码不能为空', trigger: 'blur' }
     ]
     this.editRules = Object.assign(this.editRules, nurseInfoRules)
-    this.findNurse()
+    this.findNurse({hospital:this.hospName})
     this.findSubordinateAreaList()
   },
   methods: {
@@ -471,7 +484,7 @@ export default {
           let res = await doNurseAdd(form)
           if (res.code === 200) { // 添加成功
             this.$Message.success('添加成功')
-            this.findNurse(this.searchOption)
+             this.findNurse({hospital:this.hospName})
             this.cancelAddModal()
           } else { // 添加失败
             this.$Message.error(res.message)
@@ -507,7 +520,7 @@ export default {
             let res = await doNurseEdit(data)
             if (res.code === 200) {
               this.$Message.success('编辑成功')
-              this.findNurse(this.searchOption)
+               this.findNurse({hospital:this.hospName})
               this.cancelEditModal()
             } else { // 添加失败
               this.$Message.error(res.message)
@@ -525,7 +538,7 @@ export default {
       let res = await doNurseDel(params)
       if (res.code === 200) {
         this.$Message.success('删除成功')
-        this.findNurse(this.searchOption)
+         this.findNurse({hospital:this.hospName})
       } else {
         this.$Message.error(res.message)
       }
@@ -543,6 +556,7 @@ export default {
             if (res.code === 200) {
               this.$Message.success('删除成功')
               this.delId.ids = ''
+              this.searchOption.hospital = this.hospName
               this.findNurse(this.searchOption)
             } else {
               this.$Message.error(res.message)
@@ -565,6 +579,17 @@ export default {
         this.searchOption.name = ''
       }
       this.searchOption.page = 1 // 初始化页数
+      this.searchOption.hospital = this.hospName
+      this.findNurse(this.searchOption)
+    },
+    handleSearchByHosp(){
+      if (this.searchByHosp) { // 判断搜索条件是否为空
+        this.searchOption.hospital = this.searchByHosp
+      } else { // 重置搜索内容
+        this.searchOption.hospital = ''
+      }
+      this.searchOption.page = 1 // 初始化页数
+      console.log(this.searchOption);
       this.findNurse(this.searchOption)
     },
     // 根据账号/手机查询
@@ -574,6 +599,7 @@ export default {
       } else { // 重置搜索内容
         this.searchOption.username = ''
       }
+      this.searchOption.hospital = this.hospName
       this.searchOption.page = 1 // 初始化页数
       this.findNurse(this.searchOption)
     },
@@ -654,6 +680,7 @@ export default {
     // 页面翻页
     handlePageTurn (page) {
       this.searchOption.page = page
+      this.searchOption.hospital = this.hospName
       this.findNurse(this.searchOption)
     }
   }

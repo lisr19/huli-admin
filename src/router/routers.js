@@ -57,7 +57,8 @@ export default [
     component: Main,
     meta: {
       title: '客户管理',
-      showAlways: true
+      showAlways: true,
+      access: ['user']
     },
     children: [
       {
@@ -86,7 +87,8 @@ export default [
     component: Main,
     meta: {
       title: '护士管理',
-      showAlways: true
+      showAlways: true,
+      access: ['nurse']
     },
     children: [
       {
@@ -115,7 +117,8 @@ export default [
     component: Main,
     meta: {
       title: '订单管理',
-      showAlways: true
+      showAlways: true,
+      access: ['orderList']
     },
     children: [
       {
@@ -153,7 +156,8 @@ export default [
     component: Main,
     meta: {
       title: '数据字典',
-      showAlways: true
+      showAlways: true,
+      access: ['dict']
     },
     children: [
       {
@@ -391,7 +395,8 @@ export default [
 		component: Main,
 		meta: {
 			title: '紧急求助',
-			showAlways: true
+			showAlways: true,
+      access: ['dict']
 		},
 		children: [
 			{
@@ -411,7 +416,8 @@ export default [
 		component: Main,
 		meta: {
 			title: '抗疫登记',
-			showAlways: true
+			showAlways: true,
+      access: ['ncpQr']
 		},
 		children: [
 			{
