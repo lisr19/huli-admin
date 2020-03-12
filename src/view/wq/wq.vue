@@ -6,6 +6,16 @@
 				<TabPane label="所有用户" >
 					<!--表格部分-->
 					<Card>
+            <Row style="margin: 10px 0 20px">
+              <Col span="4" offset="14">
+                <Input clearable icon="search" v-model="searchByName" @on-change="handleSearchByName"
+                       placeholder="输入姓名搜索"/>
+              </Col>
+              <Col span="4" offset="1">
+                <Input clearable icon="search" v-model="searchByPhone" @on-change="handleSearchByPhone"
+                       placeholder="输入电话搜索"/>
+              </Col>
+            </Row>
 						<div>
 							<Table :columns="columns" :data="tableData" border
 							></Table>
@@ -21,6 +31,16 @@
 				<TabPane label="可疑用户" >
 					<!--表格部分-->
 					<Card>
+            <Row style="margin: 10px 0 20px">
+              <Col span="4" offset="14">
+                <Input clearable icon="search" v-model="searchByName2" @on-change="handleSearchByName2"
+                       placeholder="输入姓名搜索"/>
+              </Col>
+              <Col span="4" offset="1">
+                <Input clearable icon="search" v-model="searchByPhone2" @on-change="handleSearchByPhone2"
+                       placeholder="输入电话搜索"/>
+              </Col>
+            </Row>
 						<div>
 							<Table :columns="columns2" :data="tableData2" border
 							></Table>
@@ -111,6 +131,10 @@ export default {
   },
   data () {
     return {
+      searchByPhone:null,
+      searchByPhone2:null,
+      searchByName:null,
+      searchByName2:null,
       countData:{},
       model1:'',
       tipList: [
@@ -369,6 +393,52 @@ export default {
     this.getRedList({hospital:this.hospital})
   },
   methods: {
+    // 根据账号/手机查询
+    handleSearchByPhone () {
+      if (this.searchByPhone) { // 判断搜索条件是否为空
+        this.searchOption.username = this.searchByPhone
+      } else { // 重置搜索内容
+        this.searchOption.username = ''
+      }
+      this.searchOption.hospital = this.hospital
+      this.searchOption.page = 1 // 初始化页数
+      this.getList(this.searchOption)
+    },
+    // 手机查询
+    handleSearchByPhone2 () {
+      if (this.searchByPhone2) { // 判断搜索条件是否为空
+        this.searchOption.username = this.searchByPhone2
+      } else { // 重置搜索内容
+        this.searchOption.username = ''
+      }
+      this.searchOption.hospital = this.hospital
+      this.searchOption.page = 1 // 初始化页数
+      this.getRedList(this.searchOption)
+    },
+
+    // 姓名
+    handleSearchByName () {
+      if (this.searchByName) { // 判断搜索条件是否为空
+        this.searchOption.name = this.searchByName
+      } else { // 重置搜索内容
+        this.searchOption.name = ''
+      }
+      this.searchOption.hospital = this.hospital
+      this.searchOption.page = 1 // 初始化页数
+      this.getList(this.searchOption)
+    },
+    // 姓名
+    handleSearchByName2 () {
+      if (this.searchByName2) { // 判断搜索条件是否为空
+        this.searchOption.name = this.searchByName2
+      } else { // 重置搜索内容
+        this.searchOption.name = ''
+      }
+      this.searchOption.hospital = this.hospital
+      this.searchOption.page = 1 // 初始化页数
+      this.getRedList(this.searchOption)
+    },
+
     async getCountList (params) {
       let res = await getCountList(params)
       if (res.code === 200) {
@@ -460,7 +530,7 @@ export default {
     },
 	  // 页面翻页
 	  handlePageTurn2 (page) {
-		  this.searchOption.page2 = page
+		  this.searchOption.page = page
       this.searchOption.hospital = this.hospital
 		  this.getRedList(this.searchOption)
 	  }

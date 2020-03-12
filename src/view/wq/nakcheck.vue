@@ -381,7 +381,7 @@ export default {
     },
 	  // 页面翻页2
     handlePageTurn2 (page) {
-      this.searchOption.page2 = page
+      this.searchOption.page = page
       this.searchOption.hospital = this.hospital
       this.getnakList2(this.searchOption)
     },
