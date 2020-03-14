@@ -330,10 +330,10 @@ export default {
     handleSuccess(res,file){
       console.log(res);
       if(res.code === 200){
-        if(res.data.length>0){
+        if(res.data.error.length>0||res.data.repeat.length>0){
           // let size = res.data.length
-          res.data= Array.from(res.data, x => x + 1)
-          this.desc = '第'+res.data+'条数据导入失败,请核实信息的正确'
+          // res.data= Array.from(res.data, x => x + 1)
+          this.desc = '第'+res.data.error+'条数据导入失败,请核实信息的正确'+'<br>'+'第'+res.data.repeat+'条数据重复'
           this.time()
           // let tip ='数据已导入,其中有'+size+'导入失败,请核实信息的正确'
           // this.$Message.warning(tip)
