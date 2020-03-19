@@ -56,13 +56,17 @@
         <TabPane label="每日登记统计" >
           <row>
             <i-col span="12">
-              <Date-picker @on-change="dataChange" type="date" placeholder="选择日期查询" style="width: 300px"></Date-picker>
+              <Date-picker  @on-clear="getCountList" @on-change="dataChange" type="date" placeholder="选择日期查询" style="width: 300px"></Date-picker>
             </i-col>
           </row>
-          <Card class="count" style=" font-size: 30px;margin-top: 20px">
-            <p v-if="currDate">日期：{{currDate}}</p>
+          <Card v-if="currDate"  class="count" style=" font-size: 30px;margin-top: 20px">
+            <p>日期：{{currDate}}</p>
             <p class="red">可疑人数：{{countData.redD}}</p>
             <p>总人数：{{countData.totalD}}</p>
+          </Card>
+          <Card v-else  class="count" style=" font-size: 30px;margin-top: 20px">
+            <p class="red">今日可疑人数：{{countData.redD}}</p>
+            <p>今日总人数：{{countData.totalD}}</p>
           </Card>
         </TabPane>
 			</Tabs>
@@ -390,7 +394,7 @@ export default {
     this.userId = localStorage.getItem('userId')
 	  this.getList({hospital:this.hospital})
 	  this.getRedList({hospital:this.hospital})
-	  this.getCountList({hospital:this.hospital})
+	  this.getCountList()
   },
   mounted () {
 
@@ -457,7 +461,10 @@ export default {
       this.getRedList(this.searchOption)
     },
 
-    async getCountList (params) {
+    async getCountList () {
+      let params={
+         hospital:this.hospital
+      }
       let res = await getCountList(params)
       if (res.code === 200) {
         this.countData= res.data
