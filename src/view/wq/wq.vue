@@ -54,7 +54,13 @@
 					</Card>
 				</TabPane>
         <TabPane label="每日登记统计" >
-          <Card class="count" style=" font-size: 30px;">
+          <row>
+            <i-col span="12">
+              <Date-picker @on-change="dataChange" type="date" placeholder="选择日期查询" style="width: 300px"></Date-picker>
+            </i-col>
+          </row>
+          <Card class="count" style=" font-size: 30px;margin-top: 20px">
+            <p v-if="currDate">日期：{{currDate}}</p>
             <p class="red">可疑人数：{{countData.redD}}</p>
             <p>总人数：{{countData.totalD}}</p>
           </Card>
@@ -95,7 +101,7 @@
 </template>
 
 <script>
-import {getList,getRedList,getDetail,pushMessage,isSendMsg,getCountList} from '../../api/wq'
+import {getList,getRedList,getDetail,pushMessage,isSendMsg,getCountList,getCountUserByDate} from '../../api/wq'
 import { wqColumns ,wqColumns2} from '../../libs/table'
 import Config from '../../config/index'
 
@@ -131,6 +137,7 @@ export default {
   },
   data () {
     return {
+      currDate:null,
       searchByPhone:null,
       searchByPhone2:null,
       searchByName:null,
@@ -393,6 +400,17 @@ export default {
     this.getRedList({hospital:this.hospital})
   },
   methods: {
+    async dataChange(date){
+      this.currDate = date
+      let params={
+         hospital:this.hospital,
+         date:date
+      }
+      let res = await getCountUserByDate(params)
+      if (res.code === 200) {
+        this.countData= res.data
+      }
+    },
     // 根据账号/手机查询
     handleSearchByPhone () {
       if (this.searchByPhone) { // 判断搜索条件是否为空

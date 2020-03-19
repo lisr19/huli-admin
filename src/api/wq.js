@@ -38,6 +38,10 @@ export function getCountList (params) {
   return fetch('ncpQuestionnaire/countUser', params)
 }
 
+export function getCountUserByDate (params) {
+  return fetch('ncpQuestionnaire/countUserByDate', params)
+}
+
 
 // 添加
 export function pushMessage (params) {

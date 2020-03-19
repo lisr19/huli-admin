@@ -85,7 +85,7 @@
             <img-upload ref="imgUploadByEdit" @imgUpload="getUploadImg" @delImg="delUploadImg"></img-upload>
           </FormItem>
           <FormItem label="账号/手机：" prop="username">
-            <Input clearable v-model="editForm.username" placeholder="请填写账号/手机"/>
+            <Input clearable v-model="editForm.username" disabled placeholder="请填写账号/手机"/>
           </FormItem>
           <FormItem label="姓名：" prop="name">
             <Input clearable v-model="editForm.name" placeholder="请填写姓名"/>
@@ -336,7 +336,7 @@ export default {
       editForm: {},
       addRules: {
         rePassword: [{ validator: validatePassCheck, trigger: 'blur' },
-          { required: true, message: '请输入确认密码', trigger: 'blur' }]
+          { message: '请输入确认密码', trigger: 'blur' }]
       },
       editRules: {
         rePassword: [{ validator: validatePassCheck, trigger: 'blur' }]
@@ -372,11 +372,11 @@ export default {
     this.addRules = Object.assign(this.addRules, customerInfoRules)
     this.addRules.password = [
       {
-        pattern: /^[^~# $……^。，；：“”‘’{}()[`%*&|+<>/,.;:'"=\]\\]{6,20}$/,
-        message: '密码格式不正确,密码由6-20位大小写字母、数字、符号：?、!、@组成',
+        pattern: /^[^~# $……^。，；：“”‘’{}()[`%*&|+<>/,.;:'"=\]\\]{6,16}$/,
+        message: '密码格式不正确,密码由6-16位大小写字母、数字、符号：?、!、@组成',
         trigger: 'blur'
       },
-      { required: true, message: '密码不能为空', trigger: 'blur' }
+      { message: '密码不能为空', trigger: 'blur' }
     ]
     this.editRules = Object.assign(this.editRules, customerInfoRules)
     this.findUser()
@@ -413,7 +413,7 @@ export default {
             this.findUser(this.searchOption)
             this.cancelAddModal()
           } else { // 添加失败
-            this.$Message.error(res.data)
+            this.$Message.error(res.message)
           }
         } else {
           this.$Message.error('请正确填写表单')
@@ -446,8 +446,8 @@ export default {
               this.$Message.success('编辑成功')
               this.findUser(this.searchOption)
               this.cancelEditModal()
-            } else { // 添加失败
-              this.$Message.error(res.data)
+            } else { 
+              this.$Message.error(res.message)
             }
           } else {
             this.$Message.error('表单没有修改')
