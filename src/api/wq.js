@@ -38,8 +38,13 @@ export function getCountList (params) {
   return fetch('ncpQuestionnaire/countUser', params)
 }
 
+
 export function getCountUserByDate (params) {
   return fetch('ncpQuestionnaire/countUserByDate', params)
+}
+
+export function getCountUserByTwoDate (params) {
+  return fetch('ncpQuestionnaire/countUserByTwoDate', params)
 }
 
 

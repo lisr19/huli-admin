@@ -69,6 +69,18 @@
             <p>今日总人数：{{countData.totalD}}</p>
           </Card>
         </TabPane>
+        <TabPane label="登记汇总统计" >
+          <row>
+            <i-col span="12">
+              <DatePicker   @on-change="dataChange2"  type="daterange" placeholder="请选择时间段搜索" style="width: 300px"></DatePicker>
+            </i-col>
+          </row>
+          <Card  class="count" style=" font-size: 30px;margin-top: 20px">
+            <p v-if="date1">日期：{{date1}} 至 {{date2}}</p>
+            <p class="red">可疑人数：{{countData2.red}}</p>
+            <p>总人数：{{countData2.total}}</p>
+          </Card>
+        </TabPane>
 			</Tabs>
 
 		</Card>
@@ -105,7 +117,7 @@
 </template>
 
 <script>
-import {getList,getRedList,getDetail,pushMessage,isSendMsg,getCountList,getCountUserByDate} from '../../api/wq'
+import {getList,getRedList,getDetail,pushMessage,isSendMsg,getCountList,getCountUserByDate,getCountUserByTwoDate} from '../../api/wq'
 import { wqColumns ,wqColumns2} from '../../libs/table'
 import Config from '../../config/index'
 
@@ -147,6 +159,7 @@ export default {
       searchByName:null,
       searchByName2:null,
       countData:{},
+      countData2:{},
       model1:'',
       tipList: [
         {
@@ -384,7 +397,9 @@ export default {
 		    total2: 1, // 数据总数
 		    currentPage2: 1// 当前页面
 	    },
-      searchOption: {} // 查询用参数
+      searchOption: {},// 查询用参数
+      date1:null,
+      date2:null,
     }
   },
   created () {
@@ -404,6 +419,20 @@ export default {
     this.getRedList({hospital:this.hospital})
   },
   methods: {
+    async dataChange2(date){
+      console.log(date);
+      this.date1 = date[0]
+      this.date2 = date[1]
+      let params={
+        hospital:this.hospital,
+        date1:date[0],
+        date2:date[1]
+      }
+      let res = await getCountUserByTwoDate(params)
+      if (res.code === 200) {
+        this.countData2= res.data
+      }
+    },
     async dataChange(date){
       this.currDate = date
       let params={
@@ -418,9 +447,9 @@ export default {
     // 根据账号/手机查询
     handleSearchByPhone () {
       if (this.searchByPhone) { // 判断搜索条件是否为空
-        this.searchOption.username = this.searchByPhone
+        this.searchOption.phone = this.searchByPhone
       } else { // 重置搜索内容
-        this.searchOption.username = ''
+        this.searchOption.phone = ''
       }
       this.searchOption.hospital = this.hospital
       this.searchOption.page = 1 // 初始化页数
@@ -429,9 +458,9 @@ export default {
     // 手机查询
     handleSearchByPhone2 () {
       if (this.searchByPhone2) { // 判断搜索条件是否为空
-        this.searchOption.username = this.searchByPhone2
+        this.searchOption.phone = this.searchByPhone2
       } else { // 重置搜索内容
-        this.searchOption.username = ''
+        this.searchOption.phone = ''
       }
       this.searchOption.hospital = this.hospital
       this.searchOption.page = 1 // 初始化页数
