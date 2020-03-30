@@ -437,7 +437,16 @@ export default [
           icon: 'md-home'
         },
         component: () => import('@/view/wq/nakcheck')
-      }
+      },
+      {
+        path: '/promise',
+        name: 'promise',
+        meta: {
+          title: '入院登记',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/promise/promise')
+      },
 		]
 	},
   // {
