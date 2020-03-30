@@ -56,7 +56,7 @@
         <TabPane label="每日登记统计" >
           <row>
             <i-col span="12">
-              <Date-picker  @on-clear="getCountList" @on-change="dataChange" type="date" placeholder="选择日期查询" style="width: 300px"></Date-picker>
+              <Date-picker :clearable="false" @on-change="dataChange" type="date" placeholder="选择日期查询" style="width: 300px"></Date-picker>
             </i-col>
           </row>
           <Card v-if="currDate"  class="count" style=" font-size: 30px;margin-top: 20px">
@@ -408,7 +408,7 @@ export default {
 	  // this.getCountList()
   },
   mounted () {
-    // this.getDate()
+    this.getDate()
   },
   activated () {
     this.getList({hospital:this.hospital})
@@ -417,6 +417,7 @@ export default {
   methods: {
     getDate(){
       this.currDate = new Date().toLocaleDateString().replace(/\//g, '-')
+      console.log(this.currDate);
       setTimeout(()=>{
         this.dataChange(this.currDate)
       },100)
@@ -440,6 +441,17 @@ export default {
       let params={
          hospital:this.hospital,
          date:date
+      }
+      let res = await getCountUserByDate(params)
+      if (res.code === 200) {
+        this.countData= res.data
+      }
+    },
+    async dataChange3(){
+      this.currDate = new Date().toLocaleDateString().replace(/\//g, '-')
+      let params={
+        hospital:this.hospital,
+        date:this.currDate
       }
       let res = await getCountUserByDate(params)
       if (res.code === 200) {
