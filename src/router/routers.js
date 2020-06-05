@@ -424,20 +424,12 @@ export default [
 				path: '/wq',
 				name: 'wq',
 				meta: {
-					title: '登记列表',
+					title: '门诊登记',
 					icon: 'md-home'
 				},
-				component: () => import('@/view/wq/wq')
+				// component: () => import('@/view/wq/wq')
+				component: () => import('@/view/wq/new-wq')
 			},
-      {
-        path: '/nakcheck',
-        name: 'nakcheck',
-        meta: {
-          title: '核酸检测结果',
-          icon: 'md-home'
-        },
-        component: () => import('@/view/wq/nakcheck')
-      },
       {
         path: '/promise',
         name: 'promise',
@@ -447,6 +439,16 @@ export default [
         },
         component: () => import('@/view/promise/promise')
       },
+      {
+        path: '/nakcheck',
+        name: 'nakcheck',
+        meta: {
+          title: '核酸检测结果',
+          icon: 'md-home'
+        },
+        component: () => import('@/view/wq/nakcheck')
+      },
+
 		]
 	},
   // {
